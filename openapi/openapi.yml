@@ -11,7 +11,7 @@ servers:
 paths:
   /health:
     get:
-      summary: 死活監視用API
+      summary: 死活監視API
       description: HTTPレベルでAPIサーバを死活監視するためのAPI。
       operationId: getHealth
       responses:
@@ -23,16 +23,87 @@ paths:
                 $ref: '#/components/schemas/ResponseSuccessGetHealth'
   /user:
     post:
+      security:
+        - bearerAuth: []
       summary: ユーザ登録API
       description: ユーザ情報を登録するAPI
       operationId: postUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestPostUser'
       responses:
-        200:
+        '200':
           description: Success Response
           content:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseSuccessPostUser'
+        '400':
+          description: Bad Request Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseBadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseInternalServerError' 
+    delete:
+      security:
+        - bearerAuth: []
+      summary: ユーザ削除API
+      description: ユーザ情報を削除するAPI
+      operationId: deleteUser
+      responses:
+        '200':
+          description: Success Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseSuccessDeleteUser'  
+        '400':
+          description: Bad Request Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseBadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseInternalServerError'    
+  /password:
+    put:
+      security:
+        - bearerAuth: []
+      summary: パスワードリセットAPI
+      description: パスワードをリセットするAPI
+      operationId: resetPassword
+      responses:
+        '200':
+          description: Success Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseSuccessResetPassword'  
+        '400':
+          description: Bad Request Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseBadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseInternalServerError'  
 components:
   securitySchemes:
     bearerAuth:
@@ -41,8 +112,28 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    RequestPostUser:
+      description: postUserのリクエストスキーマ
+      type: object
+      properties:
+        email:
+          description: Email
+          type: string
+          example: 'test@example.com'
+        user_name:
+          description: ユーザ名
+          type: string
+          example: 'test'
+        password:
+          description: パスワード
+          type: string
+          example: '1234'
+      required:
+        - email
+        - user_name
+        - password
     ResponseSuccessGetHealth:
-      description: ヘルスチェックAPIの正常系レスポンス
+      description: ヘルスチェックAPIの正常系レスポンススキーマ
       type: object
       properties:
         message:
@@ -52,12 +143,72 @@ components:
       required:
         - message
     ResponseSuccessPostUser:
-      description: ヘルスチェックAPIの正常系レスポンス
+      description: ユーザ登録APIの正常系レスポンススキーマ
       type: object
       properties:
         message:
           description: HTTPレスポンスメッセージ
           type: string
           example: 'The user registration is completed.'
+      required:
+        - message
+    ResponseSuccessDeleteUser:
+      description: ユーザ削除APIの正常系レスポンススキーマ
+      type: object
+      properties:
+        message:
+          description: HTTPレスポンスメッセージ
+          type: string
+          example: 'The user delete is completed.'
+      required:
+        - message
+    ResponseSuccessResetPassword:
+      description: パスワードリセットAPIの正常系レスポンススキーマ
+      type: object
+      properties:
+        message:
+          description: HTTPレスポンスメッセージ
+          type: string
+          example: 'The password reset is completed.'
+      required:
+        - message  
+    ResponseBadRequest:
+      description: Bad Reqeust
+      type: object
+      properties:
+        message:
+          description: HTTPレスポンスメッセージ
+          type: string
+          example: 'Something Bad Request Error'
+      required:
+        - message
+    ResponseUnauthorized:
+      description: Unauthorized
+      type: object
+      properties:
+        message:
+          description: HTTPレスポンスメッセージ
+          type: string
+          example: 'Something Unauthorized Error'
+      required:
+        - message
+    ResponseNotFound:
+      description: Not Found
+      type: object
+      properties:
+        message:
+          description: HTTPレスポンスメッセージ
+          type: string
+          example: 'Something Not Found Error'
+      required:
+        - message
+    ResponseInternalServerError:
+      description: Internal Server Error
+      type: object
+      properties:
+        message:
+          description: HTTPレスポンスメッセージ
+          type: string
+          example: 'Something Internal Server Error'
       required:
         - message    
