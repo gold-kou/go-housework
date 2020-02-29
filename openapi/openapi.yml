@@ -1,0 +1,63 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: go-housework
+  description: 家事タスクを管理するAPIサーバです。
+servers:
+  - url: http://localhost:8080
+    description: Development local server
+  - url: https://XXXX.com
+    description: Production server
+paths:
+  /health:
+    get:
+      summary: 死活監視用API
+      description: HTTPレベルでAPIサーバを死活監視するためのAPI。
+      operationId: getHealth
+      responses:
+        '200':
+          description: Success Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseSuccessGetHealth'
+  /user:
+    post:
+      summary: ユーザ登録API
+      description: ユーザ情報を登録するAPI
+      operationId: postUser
+      responses:
+        200:
+          description: Success Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseSuccessPostUser'
+components:
+  securitySchemes:
+    bearerAuth:
+      description: JWT
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ResponseSuccessGetHealth:
+      description: ヘルスチェックAPIの正常系レスポンス
+      type: object
+      properties:
+        message:
+          description: HTTPレスポンスメッセージ
+          type: string
+          example: 'The health check is clear.'
+      required:
+        - message
+    ResponseSuccessPostUser:
+      description: ヘルスチェックAPIの正常系レスポンス
+      type: object
+      properties:
+        message:
+          description: HTTPレスポンスメッセージ
+          type: string
+          example: 'The user registration is completed.'
+      required:
+        - message    
