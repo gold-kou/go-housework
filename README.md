@@ -19,6 +19,7 @@ Go/OpenAPI(Swagger)/Nginx/PostgreSQL/Docker/AWS(ECS/Fargateなど)/CircleCI/Git
 - CI/CDパイプラインの構築
 - Git
 - 認証・認可(JWT)
+- CLIツール作成能力
 
 # まだできていないもの
 - IaC
