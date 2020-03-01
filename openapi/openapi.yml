@@ -260,7 +260,7 @@ paths:
     post:
       security:
         - bearerAuth: []
-      summary: 世帯メンバ登録API。
+      summary: 世帯メンバ登録API
       description: 自身の管理する世帯にメンバを登録するAPI。世帯管理者のみ実行可能。
       operationId: registerFamilyMember
       requestBody:
@@ -288,49 +288,21 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseInternalServerError'
-    get: 
-      security:
-        - bearerAuth: []
-      summary: 世帯メンバ一覧取得API。
-      description: 自身の管理する世帯メンバ一覧を取得するAPI。世帯管理者のみ実行可能。
-      operationId: listFamilyMembers
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RequestListFamilyMembers'
-      responses:
-        '200':
-          description: Success Response
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ResponseListFamilyMembers'  
-        '400':
-          description: Bad Request Response
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ResponseBadRequest'
-        '500':
-          description: Internal Server Error
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ResponseInternalServerError'
+  /family/member/{member_id}:
     delete:
       security:
         - bearerAuth: []
-      summary: 世帯メンバ削除API。
+      summary: 世帯メンバ削除API
       description: 自身の管理する世帯メンバを削除するAPI。世帯管理者のみ実行可能。
-      operationId: deleteFamilyMember
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RequestDeleteFamilyMember'
+      parameters:
+        - in: path
+          name: member_id
+          description: 世帯メンバID
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1
       responses:
         '200':
           description: Success Response
@@ -350,26 +322,20 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseInternalServerError'
-  /task:
-    post:
+  /family/members:
+    get: 
       security:
         - bearerAuth: []
-      summary: 家事タスク登録API。
-      description: 自身の所属する世帯に家事タスクを作成するAPI
-      operationId: createTask
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RequestCreateTask'
+      summary: 世帯メンバ一覧取得API
+      description: 自身の管理する世帯メンバ一覧を取得するAPI。世帯管理者のみ実行可能。
+      operationId: listFamilyMembers
       responses:
         '200':
           description: Success Response
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ResponseCreateTask'  
+                $ref: '#/components/schemas/ResponseListFamilyMembers'  
         '400':
           description: Bad Request Response
           content:
@@ -382,18 +348,19 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseInternalServerError'
-    get:
+  /task:
+    post:
       security:
         - bearerAuth: []
-      summary: 家事タスク一覧取得API。
-      description: 自身の所属する世帯の家事タスク一覧を取得するAPI
-      operationId: listTasks
+      summary: 家事タスク登録API
+      description: 自身の所属する世帯に家事タスクを作成するAPI
+      operationId: createTask
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RequestListTasks'
+              $ref: '#/components/schemas/RequestCreateTask'
       responses:
         '200':
           description: Success Response
@@ -444,18 +411,22 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseInternalServerError'
+  /task/{task_id}:  
     delete:
       security:
         - bearerAuth: []
       summary: 家事タスク削除API
       description: 自身の所属する世帯の家事タスクを削除するAPI
       operationId: deleteTask
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RequestDeleteTask'
+      parameters:
+        - in: path
+          name: task_id
+          description: 家事タスクID
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1
       responses:
         '200':
           description: Success Response
@@ -475,6 +446,39 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseInternalServerError'
+  /tasks:
+    get:
+      security:
+        - bearerAuth: []
+      summary: 家事タスク一覧取得API
+      description: 自身の所属する世帯の家事タスク一覧を取得するAPI
+      operationId: listTasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestListTasks'
+      responses:
+        '200':
+          description: Success Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseCreateTask'  
+        '400':
+          description: Bad Request Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseBadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseInternalServerError'
+  
 components:
   securitySchemes:
     bearerAuth:
@@ -534,6 +538,7 @@ components:
           example: 'LeBron'
       required:
         - member_name
+        
     # Response
     ResponseGetHealth:
       description: ヘルスチェックAPIの正常系レスポンススキーマ
@@ -636,22 +641,6 @@ components:
         - family_id
         - family_name
         - members
-    Member:
-      description: Memberスキーマ
-      type: object
-      properties:
-        member_id:
-          description: 家族メンバID
-          type: integer
-          format: int64
-          example: 1
-        member_name:
-          description: 家族メンバ名。ユーザ名と一致する。
-          type: string
-          example: 'LeBron'
-      required:
-        - member_id
-        - member_name  
     ResponseDeleteFamily:
       description: 世帯削除APIの正常系レスポンススキーマ
       type: object
@@ -688,6 +677,43 @@ components:
           description: 家族メンバ名。ユーザ名と一致する。
           type: string
           example: 'LeBron'
+    ResponseListFamilyMembers:
+      description: 世帯メンバ情報一覧取得APIの正常系レスポンススキーマ
+      type: object
+      properties:
+        family_id:
+          description: 家族ID。UUID。
+          type: string
+          example: '342a0640-8443-462f-afd0-93940c9278f5'
+        family_name: 
+          description: 家族名
+          type: string
+          example: 'James'
+        members:
+          description: 家族メンバ情報の集合
+          type: array
+          items:
+            $ref: '#/components/schemas/Member'  
+      required:
+        - family_id
+        - family_name
+        - members
+    Member:
+      description: Memberスキーマ
+      type: object
+      properties:
+        member_id:
+          description: 家族メンバID
+          type: integer
+          format: int64
+          example: 1
+        member_name:
+          description: 家族メンバ名。ユーザ名と一致する。
+          type: string
+          example: 'LeBron'
+      required:
+        - member_id
+        - member_name 
     ResponseBadRequest:
       description: Bad Reqeust
       type: object
