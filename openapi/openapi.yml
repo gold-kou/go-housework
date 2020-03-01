@@ -20,27 +20,27 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ResponseSuccessGetHealth'
+                $ref: '#/components/schemas/ResponseGetHealth'
   /user:
     post:
       security:
         - bearerAuth: []
       summary: ユーザ登録API
       description: ユーザ情報を登録するAPI
-      operationId: postUser
+      operationId: createUser
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RequestPostUser'
+              $ref: '#/components/schemas/RequestCreateUser'
       responses:
         '200':
           description: Success Response
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ResponseSuccessPostUser'
+                $ref: '#/components/schemas/ResponseCreateUser'
         '400':
           description: Bad Request Response
           content:
@@ -57,7 +57,7 @@ paths:
       security:
         - bearerAuth: []
       summary: ユーザ削除API
-      description: ユーザ情報を削除するAPI
+      description: ユーザ情報(自身のみ)を削除するAPI
       operationId: deleteUser
       responses:
         '200':
@@ -65,7 +65,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ResponseSuccessDeleteUser'  
+                $ref: '#/components/schemas/ResponseDeleteUser'  
         '400':
           description: Bad Request Response
           content:
@@ -91,7 +91,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ResponseSuccessResetPassword'  
+                $ref: '#/components/schemas/ResponseResetPassword'  
         '400':
           description: Bad Request Response
           content:
@@ -103,7 +103,134 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ResponseInternalServerError'  
+                $ref: '#/components/schemas/ResponseInternalServerError'
+  /login:
+    post:
+      summary: ログインAPI
+      description: ログインAPI
+      operationId: login
+      parameters:
+        - in: query
+          name: email
+          description: Email
+          required: true
+          schema:
+            type: string
+            example: 'test@example.com'
+        - in: query
+          name: password
+          description: Password
+          required: true
+          schema:
+            type: string
+            example: '1234'    
+      responses:
+        '200':
+          description: Success Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseLogin'  
+        '400':
+          description: Bad Request Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseBadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseInternalServerError'
+  /family:
+    post:
+      security:
+        - bearerAuth: []
+      summary: 世帯登録API
+      description: 世帯を登録するAPI。登録者が世帯管理者となる。世帯管理者は変更できない。
+      operationId: createFamily
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestCreateFamily'
+      responses:
+        '200':
+          description: Success Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseCreateFamily'  
+        '400':
+          description: Bad Request Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseBadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseInternalServerError'
+    get:
+      security:
+        - bearerAuth: []
+      summary: 世帯詳細情報取得API
+      description: 世帯詳細情報を取得するAPI。世帯管理者のみ実行可能。
+      operationId: showFamily
+      responses:
+        '200':
+          description: Success Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseShowFamily'  
+        '400':
+          description: Bad Request Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseBadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseInternalServerError'
+    update:
+      security:
+        - bearerAuth: []
+      summary: 世帯情報更新API
+      description: 世帯情報を更新するAPI。世帯管理者のみ実行可能。
+      operationId: updateFamily
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestUpdateFamily'
+      responses:
+        '200':
+          description: Success Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseUpdateFamily'  
+        '400':
+          description: Bad Request Response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseBadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseInternalServerError'
 components:
   securitySchemes:
     bearerAuth:
@@ -112,8 +239,8 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
-    RequestPostUser:
-      description: postUserのリクエストスキーマ
+    RequestCreateUser:
+      description: createUserのリクエストスキーマ
       type: object
       properties:
         email:
@@ -132,7 +259,27 @@ components:
         - email
         - user_name
         - password
-    ResponseSuccessGetHealth:
+    RequestCreateFamily:
+      description: createFamilyのリクエストスキーマ
+      type: object
+      properties:
+        family_name:
+          description: 家族名
+          type: string
+          example: 'James'
+      required:
+        - family_name
+    RequestUpdateFamily:
+      description: updateFamilyのリクエストスキーマ。現状、家族名のみ変更可能なため、family_nameを必須プロパティとしている。
+      type: object
+      properties:
+        family_name:
+          description: 家族名
+          type: string
+          example: 'James'
+      required:
+        - family_name
+    ResponseGetHealth:
       description: ヘルスチェックAPIの正常系レスポンススキーマ
       type: object
       properties:
@@ -142,7 +289,7 @@ components:
           example: 'The health check is clear.'
       required:
         - message
-    ResponseSuccessPostUser:
+    ResponseCreateUser:
       description: ユーザ登録APIの正常系レスポンススキーマ
       type: object
       properties:
@@ -152,7 +299,7 @@ components:
           example: 'The user registration is completed.'
       required:
         - message
-    ResponseSuccessDeleteUser:
+    ResponseDeleteUser:
       description: ユーザ削除APIの正常系レスポンススキーマ
       type: object
       properties:
@@ -162,7 +309,7 @@ components:
           example: 'The user delete is completed.'
       required:
         - message
-    ResponseSuccessResetPassword:
+    ResponseResetPassword:
       description: パスワードリセットAPIの正常系レスポンススキーマ
       type: object
       properties:
@@ -171,7 +318,84 @@ components:
           type: string
           example: 'The password reset is completed.'
       required:
-        - message  
+        - message
+    ResponseLogin:
+      description: ログインAPIの正常系レスポンススキーマ
+      type: object
+      properties:
+        message:
+          description: HTTPレスポンスメッセージ
+          type: string
+          example: 'Login successed.'
+      required:
+        - message
+    ResponseCreateFamily:
+      description: 世帯登録APIの正常系レスポンススキーマ
+      type: object
+      properties:
+        family_id:
+          description: 家族ID。UUID。
+          type: string
+          example: '342a0640-8443-462f-afd0-93940c9278f5'
+        family_name: 
+          description: 家族名
+          type: string
+          example: 'James'
+      required:
+        - family_id
+        - family_name
+    ResponseUpdateFamily:
+      description: 世帯更新APIの正常系レスポンススキーマ
+      type: object
+      properties:
+        family_id:
+          description: 家族ID。UUID。
+          type: string
+          example: '342a0640-8443-462f-afd0-93940c9278f5'
+        family_name: 
+          description: 家族名
+          type: string
+          example: 'James'
+      required:
+        - family_id
+        - family_name
+    ResponseShowFamily:
+      description: 世帯詳細情報取得APIの正常系レスポンススキーマ
+      type: object
+      properties:
+        family_id:
+          description: 家族ID。UUID。
+          type: string
+          example: '342a0640-8443-462f-afd0-93940c9278f5'
+        family_name: 
+          description: 家族名
+          type: string
+          example: 'James'
+        members:
+          description: 家族構成員情報の集合
+          type: array
+          items:
+            $ref: '#/components/schemas/Member'  
+      required:
+        - family_id
+        - family_name
+        - members
+    Member:
+      description: Memberスキーマ
+      type: object
+      properties:
+        member_id:
+          description: 家族構成員ID
+          type: integer
+          format: int64
+          example: 1
+        member_name:
+          description: 家族構成員名。ユーザ名と一致する。
+          type: string
+          example: 'LeBron'
+      required:
+        - member_id
+        - member_name  
     ResponseBadRequest:
       description: Bad Reqeust
       type: object
