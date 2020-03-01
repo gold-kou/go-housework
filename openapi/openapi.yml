@@ -1,4 +1,3 @@
-# TODO もっとDRYに書けそう
 openapi: 3.0.0
 info:
   version: 1.0.0
@@ -570,6 +569,21 @@ components:
       bearerFormat: JWT
   schemas:
     # common
+    Family:
+      description: Familyスキーマ
+      type: object
+      properties:
+        family_id:
+          description: 家族ID。UUID。
+          type: string
+          example: '342a0640-8443-462f-afd0-93940c9278f5'
+        family_name: 
+          description: 家族名
+          type: string
+          example: 'James'
+      required:
+        - family_id
+        - family_name
     Member:
       description: Memberスキーマ
       type: object
@@ -609,6 +623,11 @@ components:
           enum:
             - 'todo'
             - 'done'
+      required:
+        - task_id
+        - task_name
+        - member_name
+        - status
     # Request
     RequestCreateUser:
       description: createUserのリクエストスキーマ
@@ -696,27 +715,10 @@ components:
       description: updateTaskのリクエストスキーマ
       type: object
       properties:
-        task_id:
-          description: 家事タスクID
-          type: integer
-          format: int64
-          example: 1
-        task_name:
-          description: 家事タスク名
-          type: string
-          example: 'Cooking lunch'
-        member_name:
-          description: ユーザ名。家事の担当者。
-          type: string
-          example: 'LeBron'
-        status:
-          description: 家事進捗ステータス
-          type: string
-          enum:
-            - 'todo'
-            - 'done'
+        task:
+          $ref: '#/components/schemas/Task'
       required:
-        - task_id
+        - task
     
     # Response
     ResponseGetHealth:
@@ -773,109 +775,66 @@ components:
       description: 世帯登録APIの正常系レスポンススキーマ
       type: object
       properties:
-        family_id:
-          description: 家族ID。UUID。
-          type: string
-          example: '342a0640-8443-462f-afd0-93940c9278f5'
-        family_name: 
-          description: 家族名
-          type: string
-          example: 'James'
+        family:
+          $ref: '#/components/schemas/Family'
       required:
-        - family_id
-        - family_name
+        - family
     ResponseUpdateFamily:
       description: 世帯更新APIの正常系レスポンススキーマ
       type: object
       properties:
-        family_id:
-          description: 家族ID。UUID。
-          type: string
-          example: '342a0640-8443-462f-afd0-93940c9278f5'
-        family_name: 
-          description: 家族名
-          type: string
-          example: 'James'
+        family:
+          $ref: '#/components/schemas/Family'
       required:
-        - family_id
-        - family_name
+        - family
     ResponseShowFamily:
       description: 世帯詳細情報取得APIの正常系レスポンススキーマ
       type: object
       properties:
-        family_id:
-          description: 家族ID。UUID。
-          type: string
-          example: '342a0640-8443-462f-afd0-93940c9278f5'
-        family_name: 
-          description: 家族名
-          type: string
-          example: 'James'
+        family:
+          $ref: '#/components/schemas/Family'
         members:
           description: 家族メンバ情報の集合
           type: array
           items:
             $ref: '#/components/schemas/Member'  
       required:
-        - family_id
-        - family_name
+        - family
         - members
     ResponseDeleteFamily:
       description: 世帯削除APIの正常系レスポンススキーマ
       type: object
       properties:
-        family_id:
-          description: 家族ID。UUID。
+        message:
+          description: HTTPレスポンスメッセージ
           type: string
-          example: '342a0640-8443-462f-afd0-93940c9278f5'
-        family_name: 
-          description: 家族名
-          type: string
-          example: 'James'
+          example: 'The family is deleted.'
       required:
-        - family_id
-        - family_name
+        - message
     ResponseRegisterFamilyMember:
       description: 世帯詳細情報取得APIの正常系レスポンススキーマ
       type: object
       properties:
-        family_id:
-          description: 家族ID。UUID。
-          type: string
-          example: '342a0640-8443-462f-afd0-93940c9278f5'
-        family_name: 
-          description: 家族名
-          type: string
-          example: 'James'
-        member_id:
-          description: 家族メンバID
-          type: integer
-          format: int64
-          example: 1
-        member_name:
-          description: 家族メンバ名。ユーザ名と一致する。
-          type: string
-          example: 'LeBron'
+        family:
+          $ref: '#/components/schemas/Family'
+        member:
+          $ref: '#/components/schemas/Member'
+      required:
+        - family
+        - member
     ResponseListFamilyMembers:
       description: 世帯メンバ情報一覧取得APIの正常系レスポンススキーマ
       type: object
       properties:
-        family_id:
-          description: 家族ID。UUID。
-          type: string
-          example: '342a0640-8443-462f-afd0-93940c9278f5'
-        family_name: 
-          description: 家族名
-          type: string
-          example: 'James'
+        family:
+          $ref: '#/components/schemas/Family'
         members:
           description: 家族メンバ情報の集合
           type: array
           items:
             $ref: '#/components/schemas/Member'  
       required:
-        - family_id
-        - family_name
+        - family
         - members
     ResponseDeleteFamilyMember:
       description: 世帯メンバ削除APIの正常系レスポンススキーマ
@@ -891,71 +850,24 @@ components:
       description: 家事タスク作成APIの正常系レスポンススキーマ
       type: object
       properties:
-        family_id:
-          description: 家族ID。UUID。
-          type: string
-          example: '342a0640-8443-462f-afd0-93940c9278f5'
-        family_name: 
-          description: 家族名
-          type: string
-          example: 'James'
-        task_id:
-          description: 家事タスクID
-          type: integer
-          format: int64
-          example: 1
-        task_name:
-          description: 家事タスク名
-          type: string
-          example: 'Cooking lunch'
-        member_name:
-          description: ユーザ名。家事の担当者。
-          type: string
-          example: 'LeBron'
-        status:
-          description: 家事進捗ステータス
-          type: string
-          enum:
-            - 'todo'
-            - 'done'
+        family:
+          $ref: '#/components/schemas/Family'
+        task:
+          $ref: '#/components/schemas/Task'
       required:
-        - family_id
-        - family_name
-        - task_id
-        - task_name
-        - status
-        - member_name
+        - family
+        - task
     ResponseUpdateTask:
       description: 家事タスク更新APIの正常系レスポンススキーマ
       type: object
       properties:
-        family_id:
-          description: 家族ID。UUID。
-          type: string
-          example: '342a0640-8443-462f-afd0-93940c9278f5'
-        family_name: 
-          description: 家族名
-          type: string
-          example: 'James'
-        task_id:
-          description: 家事タスクID
-          type: integer
-          format: int64
-          example: 1
-        task_name:
-          description: 家事タスク名
-          type: string
-          example: 'Cooking lunch'
-        member_name:
-          description: ユーザ名。家事の担当者。
-          type: string
-          example: 'LeBron'
-        status:
-          description: 家事進捗ステータス
-          type: string
-          enum:
-            - 'todo'
-            - 'done'
+        family:
+          $ref: '#/components/schemas/Family'
+        task:
+          $ref: '#/components/schemas/Task'
+      required:
+        - family
+        - task    
     ResponseDeleteTask:
       description: 世帯メンバ削除APIの正常系レスポンススキーマ
       type: object
@@ -970,22 +882,15 @@ components:
       description: 家事タスク更新APIの正常系レスポンススキーマ
       type: object
       properties:
-        family_id:
-          description: 家族ID。UUID。
-          type: string
-          example: '342a0640-8443-462f-afd0-93940c9278f5'
-        family_name: 
-          description: 家族名
-          type: string
-          example: 'James'
+        family:
+          $ref: '#/components/schemas/Family'
         tasks:
           description: 家事タスク情報の集合
           type: array
           items:
             $ref: '#/components/schemas/Task' 
       required:
-        - family_id
-        - family_name
+        - family
         - tasks
     ResponseBadRequest:
       description: Bad Reqeust
