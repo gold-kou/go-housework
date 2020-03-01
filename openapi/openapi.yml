@@ -1,3 +1,4 @@
+# TODO もっとDRYに書けそう
 openapi: 3.0.0
 info:
   version: 1.0.0
@@ -23,8 +24,6 @@ paths:
                 $ref: '#/components/schemas/ResponseGetHealth'
   /user:
     post:
-      security:
-        - bearerAuth: []
       summary: ユーザ登録API
       description: ユーザ情報を登録するAPI
       operationId: createUser
@@ -72,6 +71,12 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseBadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseUnauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -80,11 +85,15 @@ paths:
                 $ref: '#/components/schemas/ResponseInternalServerError'    
   /password:
     put:
-      security:
-        - bearerAuth: []
       summary: パスワードリセットAPI
-      description: パスワードをリセットするAPI
+      description: パスワードをリセットするAPI。パスワード忘れ時に使用。
       operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestResetPassword'
       responses:
         '200':
           description: Success Response
@@ -169,6 +178,12 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseBadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseUnauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -194,6 +209,12 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseBadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseUnauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -225,6 +246,12 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseBadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseUnauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -250,6 +277,12 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseBadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseUnauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -282,6 +315,12 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseBadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseUnauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -316,6 +355,18 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseBadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseUnauthorized'
+        '404':
+          description: Not Found
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseNotFound'
         '500':
           description: Internal Server Error
           content:
@@ -342,6 +393,12 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseBadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseUnauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -365,6 +422,7 @@ paths:
         '200':
           description: Success Response
           content:
+          
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseCreateTask'  
@@ -374,6 +432,12 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseBadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseUnauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -384,7 +448,7 @@ paths:
       security:
         - bearerAuth: []
       summary: 家事タスク更新API
-      description: 自身の所属する世帯の家事タスクを更新するAPI
+      description: 自身の所属する世帯の家事タスクを更新するAPI。タスク名、担当者名、ステータスを変更可能。
       operationId: updateTask
       requestBody:
         required: true
@@ -405,6 +469,12 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseBadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseUnauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -440,6 +510,18 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseBadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseUnauthorized'
+        '404':
+          description: Not Found
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseNotFound'
         '500':
           description: Internal Server Error
           content:
@@ -453,25 +535,25 @@ paths:
       summary: 家事タスク一覧取得API
       description: 自身の所属する世帯の家事タスク一覧を取得するAPI
       operationId: listTasks
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RequestListTasks'
       responses:
         '200':
           description: Success Response
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ResponseCreateTask'  
+                $ref: '#/components/schemas/ResponseListTasks'  
         '400':
           description: Bad Request Response
           content:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseBadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ResponseUnauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -487,6 +569,46 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    # common
+    Member:
+      description: Memberスキーマ
+      type: object
+      properties:
+        member_id:
+          description: 家族メンバID
+          type: integer
+          format: int64
+          example: 1
+        member_name:
+          description: 家族メンバ名。ユーザ名と一致する。
+          type: string
+          example: 'LeBron'
+      required:
+        - member_id
+        - member_name 
+    Task:
+      description: Taskスキーマ
+      type: object
+      properties:
+        task_id:
+          description: 家事タスクID
+          type: integer
+          format: int64
+          example: 1
+        task_name:
+          description: 家事タスク名
+          type: string
+          example: 'Cooking lunch'
+        member_name:
+          description: ユーザ名。家事の担当者。
+          type: string
+          example: 'LeBron'
+        status:
+          description: 家事進捗ステータス
+          type: string
+          enum:
+            - 'todo'
+            - 'done'
     # Request
     RequestCreateUser:
       description: createUserのリクエストスキーマ
@@ -508,6 +630,16 @@ components:
         - email
         - user_name
         - password
+    RequestResetPassword:
+      description: createUserのリクエストスキーマ
+      type: object
+      properties:
+        email:
+          description: Email
+          type: string
+          example: 'test@example.com'
+      required:
+        - email    
     RequestCreateFamily:
       description: createFamilyのリクエストスキーマ
       type: object
@@ -538,7 +670,54 @@ components:
           example: 'LeBron'
       required:
         - member_name
-        
+    RequestCreateTask:
+      description: createTaskのリクエストスキーマ
+      type: object
+      properties:
+        task_name:
+          description: 家事タスク名
+          type: string
+          example: 'Cooking lunch'
+        member_name:
+          description: ユーザ名。家事の担当者。
+          type: string
+          example: 'LeBron'
+        status: 
+          description: 家事進捗ステータス
+          type: string
+          enum:
+            - 'todo'
+            - 'done'
+      required:
+        - task_name
+        - member_name
+        - status
+    RequestUpdateTask:
+      description: updateTaskのリクエストスキーマ
+      type: object
+      properties:
+        task_id:
+          description: 家事タスクID
+          type: integer
+          format: int64
+          example: 1
+        task_name:
+          description: 家事タスク名
+          type: string
+          example: 'Cooking lunch'
+        member_name:
+          description: ユーザ名。家事の担当者。
+          type: string
+          example: 'LeBron'
+        status:
+          description: 家事進捗ステータス
+          type: string
+          enum:
+            - 'todo'
+            - 'done'
+      required:
+        - task_id
+    
     # Response
     ResponseGetHealth:
       description: ヘルスチェックAPIの正常系レスポンススキーマ
@@ -698,22 +877,116 @@ components:
         - family_id
         - family_name
         - members
-    Member:
-      description: Memberスキーマ
+    ResponseDeleteFamilyMember:
+      description: 世帯メンバ削除APIの正常系レスポンススキーマ
       type: object
       properties:
-        member_id:
-          description: 家族メンバID
+        message:
+          description: HTTPレスポンスメッセージ
+          type: string
+          example: 'The user is deleted.'
+      required:
+        - message
+    ResponseCreateTask:
+      description: 家事タスク作成APIの正常系レスポンススキーマ
+      type: object
+      properties:
+        family_id:
+          description: 家族ID。UUID。
+          type: string
+          example: '342a0640-8443-462f-afd0-93940c9278f5'
+        family_name: 
+          description: 家族名
+          type: string
+          example: 'James'
+        task_id:
+          description: 家事タスクID
           type: integer
           format: int64
           example: 1
+        task_name:
+          description: 家事タスク名
+          type: string
+          example: 'Cooking lunch'
         member_name:
-          description: 家族メンバ名。ユーザ名と一致する。
+          description: ユーザ名。家事の担当者。
           type: string
           example: 'LeBron'
+        status:
+          description: 家事進捗ステータス
+          type: string
+          enum:
+            - 'todo'
+            - 'done'
       required:
-        - member_id
-        - member_name 
+        - family_id
+        - family_name
+        - task_id
+        - task_name
+        - status
+        - member_name
+    ResponseUpdateTask:
+      description: 家事タスク更新APIの正常系レスポンススキーマ
+      type: object
+      properties:
+        family_id:
+          description: 家族ID。UUID。
+          type: string
+          example: '342a0640-8443-462f-afd0-93940c9278f5'
+        family_name: 
+          description: 家族名
+          type: string
+          example: 'James'
+        task_id:
+          description: 家事タスクID
+          type: integer
+          format: int64
+          example: 1
+        task_name:
+          description: 家事タスク名
+          type: string
+          example: 'Cooking lunch'
+        member_name:
+          description: ユーザ名。家事の担当者。
+          type: string
+          example: 'LeBron'
+        status:
+          description: 家事進捗ステータス
+          type: string
+          enum:
+            - 'todo'
+            - 'done'
+    ResponseDeleteTask:
+      description: 世帯メンバ削除APIの正常系レスポンススキーマ
+      type: object
+      properties:
+        message:
+          description: HTTPレスポンスメッセージ
+          type: string
+          example: 'The task is deleted.'
+      required:
+        - message
+    ResponseListTasks:
+      description: 家事タスク更新APIの正常系レスポンススキーマ
+      type: object
+      properties:
+        family_id:
+          description: 家族ID。UUID。
+          type: string
+          example: '342a0640-8443-462f-afd0-93940c9278f5'
+        family_name: 
+          description: 家族名
+          type: string
+          example: 'James'
+        tasks:
+          description: 家事タスク情報の集合
+          type: array
+          items:
+            $ref: '#/components/schemas/Task' 
+      required:
+        - family_id
+        - family_name
+        - tasks
     ResponseBadRequest:
       description: Bad Reqeust
       type: object
