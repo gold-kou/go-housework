@@ -64,12 +64,6 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseDeleteUser'  
-        '400':
-          description: Bad Request Response
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ResponseBadRequest'
         '401':
           description: Unauthorized
           content:
@@ -100,12 +94,6 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseResetPassword'  
-        '400':
-          description: Bad Request Response
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ResponseBadRequest'
         '500':
           description: Internal Server Error
           content:
@@ -202,12 +190,6 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseShowFamily'  
-        '400':
-          description: Bad Request Response
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ResponseBadRequest'
         '401':
           description: Unauthorized
           content:
@@ -270,12 +252,6 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseDeleteFamily'  
-        '400':
-          description: Bad Request Response
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ResponseBadRequest'
         '401':
           description: Unauthorized
           content:
@@ -386,12 +362,6 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ResponseListFamilyMembers'  
-        '400':
-          description: Bad Request Response
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ResponseBadRequest'
         '401':
           description: Unauthorized
           content:
@@ -569,14 +539,28 @@ components:
       bearerFormat: JWT
   schemas:
     # common
+    User:
+      description: Userスキーマ
+      type: object
+      properties:
+        user_id:
+          description: ユーザID。メンバIDと一致する。
+          type: integer
+          format: int64
+          example: 1
+        user_name:
+          description: ユーザ名。メンバ名と一致する。
+          type: string
+          example: 'LeBron'
     Family:
       description: Familyスキーマ
       type: object
       properties:
         family_id:
-          description: 家族ID。UUID。
-          type: string
-          example: '342a0640-8443-462f-afd0-93940c9278f5'
+          description: 家族ID
+          type: integer
+          format: int64
+          example: 1
         family_name: 
           description: 家族名
           type: string
@@ -623,11 +607,16 @@ components:
           enum:
             - 'todo'
             - 'done'
+        date:
+          description: 担当日付
+          type: string
+          example: "2020-03-01"
       required:
         - task_id
         - task_name
         - member_name
         - status
+        - date
     # Request
     RequestCreateUser:
       description: createUserのリクエストスキーマ
@@ -707,10 +696,15 @@ components:
           enum:
             - 'todo'
             - 'done'
+        date:
+          description: 担当日付
+          type: string
+          example: "2020-03-01"
       required:
         - task_name
         - member_name
         - status
+        - date
     RequestUpdateTask:
       description: updateTaskのリクエストスキーマ
       type: object
@@ -735,21 +729,27 @@ components:
       description: ユーザ登録APIの正常系レスポンススキーマ
       type: object
       properties:
+        user:
+          $ref: '#/components/schemas/User'
         message:
           description: HTTPレスポンスメッセージ
           type: string
           example: 'The user registration is completed.'
       required:
+        - user
         - message
     ResponseDeleteUser:
       description: ユーザ削除APIの正常系レスポンススキーマ
       type: object
       properties:
+        user:
+          $ref: '#/components/schemas/User'
         message:
           description: HTTPレスポンスメッセージ
           type: string
-          example: 'The user delete is completed.'
+          example: 'Deleted'
       required:
+        - user
         - message
     ResponseResetPassword:
       description: パスワードリセットAPIの正常系レスポンススキーマ
@@ -805,11 +805,14 @@ components:
       description: 世帯削除APIの正常系レスポンススキーマ
       type: object
       properties:
+        family:
+          $ref: '#/components/schemas/Family'
         message:
           description: HTTPレスポンスメッセージ
           type: string
-          example: 'The family is deleted.'
+          example: 'Deleted'
       required:
+        - family
         - message
     ResponseRegisterFamilyMember:
       description: 世帯詳細情報取得APIの正常系レスポンススキーマ
@@ -840,11 +843,17 @@ components:
       description: 世帯メンバ削除APIの正常系レスポンススキーマ
       type: object
       properties:
+        family:
+          $ref: '#/components/schemas/Family'
+        member:
+          $ref: '#/components/schemas/Member'
         message:
           description: HTTPレスポンスメッセージ
           type: string
-          example: 'The user is deleted.'
+          example: 'Deleted the member from the family'
       required:
+        - family
+        - member
         - message
     ResponseCreateTask:
       description: 家事タスク作成APIの正常系レスポンススキーマ
@@ -872,14 +881,17 @@ components:
       description: 世帯メンバ削除APIの正常系レスポンススキーマ
       type: object
       properties:
+        task:
+          $ref: '#/components/schemas/Task'
         message:
           description: HTTPレスポンスメッセージ
           type: string
-          example: 'The task is deleted.'
+          example: 'Deleted'
       required:
+        - task
         - message
     ResponseListTasks:
-      description: 家事タスク更新APIの正常系レスポンススキーマ
+      description: 家事タスク一覧取得APIの正常系レスポンススキーマ
       type: object
       properties:
         family:
