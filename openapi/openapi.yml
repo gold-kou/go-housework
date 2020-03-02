@@ -502,8 +502,16 @@ paths:
       security:
         - bearerAuth: []
       summary: 家事タスク一覧取得API
-      description: 自身の所属する世帯の家事タスク一覧を取得するAPI
+      description: 自身の所属する指定日付の世帯の家事タスク一覧を取得するAPI
       operationId: listTasks
+      parameters:
+        - in: query
+          name: date
+          description: 担当日付
+          required: true
+          schema:
+            type: string
+            example: "2020-03-01"
       responses:
         '200':
           description: Success Response
