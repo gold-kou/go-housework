@@ -1,0 +1,107 @@
+package common
+
+import "github.com/lib/pq"
+
+const uniqueViolation = pq.ErrorCode("23505")
+const lockNotAvailable = pq.ErrorCode("55P03")
+
+// BadRequestError represents error of bad request
+type BadRequestError struct {
+	Message string
+	Errors  []map[string]string
+}
+
+// AuthorizationError represents error of authorization
+type AuthorizationError struct {
+	Message string
+}
+
+// ConflictError represents error of conflict
+type ConflictError struct {
+	Message string
+}
+
+// NotFoundError represents error of not found
+type NotFoundError struct {
+	Message string
+}
+
+// InternalServerError represents error of internal server
+type InternalServerError struct {
+	Message string
+}
+
+// NewBadRequestError returns a new pointer of BadRequestError that contains a message of an argument
+func NewBadRequestError(message string, errors ...map[string]string) *BadRequestError {
+	return &BadRequestError{
+		Message: message,
+		Errors:  errors,
+	}
+}
+
+func (b *BadRequestError) Error() string {
+	return b.Message
+}
+
+// NewAuthorizationError returns a new pointer of AuthorizationError that contains a message of an argument
+func NewAuthorizationError(message string) *AuthorizationError {
+	return &AuthorizationError{
+		Message: message,
+	}
+}
+
+func (a *AuthorizationError) Error() string {
+	return a.Message
+}
+
+// NewNotFoundError returns a new pointer of NotFoundError that contains a message of an argument
+func NewNotFoundError(message string) *NotFoundError {
+	return &NotFoundError{
+		Message: message,
+	}
+}
+
+func (i *NotFoundError) Error() string {
+	return i.Message
+}
+
+// NewInternalServerError returns a new pointer of InternalServerError that contains a message of an argument
+func NewInternalServerError(message string) *InternalServerError {
+	return &InternalServerError{
+		Message: message,
+	}
+}
+
+func (i *InternalServerError) Error() string {
+	return i.Message
+}
+
+// IsDuplicateKeyError returns true if err is uniqueViolation
+func IsDuplicateKeyError(err error) bool {
+	switch e := err.(type) {
+	case nil:
+		return false
+	case *pq.Error:
+		if e.Code == uniqueViolation {
+			return true
+		}
+		return false
+	default:
+		return false
+	}
+}
+
+// IsLockNotAvailableError returns true if err is lockNotAvailable
+func IsLockNotAvailableError(err error) bool {
+	switch e := err.(type) {
+	case nil:
+		return false
+	case *pq.Error:
+		if e.Code == lockNotAvailable {
+			return true
+		}
+		return false
+	default:
+		return false
+	}
+}

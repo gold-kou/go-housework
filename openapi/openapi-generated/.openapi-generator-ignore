@@ -1,0 +1,11 @@
+Dockerfile
+
+# 不要ドキュメントのため自動生成しない
+api/openapi.yaml
+README.md
+
+# 初回生成時にcmd/run-serverに移動して、再度自動生成しない
+main.go
+
+# 独自ロガーを別途用意するため、自動生成しない
+go/logger.go

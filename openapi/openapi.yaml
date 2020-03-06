@@ -308,6 +308,7 @@ paths:
         - bearerAuth: []
       summary: 世帯メンバ削除API
       description: 自身の管理する世帯メンバを削除するAPI。世帯管理者のみ実行可能。
+      operationId: deleteFamilyMember
       parameters:
         - in: path
           name: member_id
@@ -951,4 +952,5 @@ components:
           type: string
           example: 'Something Internal Server Error'
       required:
-        - message    
+        - message
+        

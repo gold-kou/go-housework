@@ -1,0 +1,44 @@
+version: 2
+jobs:
+  test-all:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: docker-compose up
+          command: docker-compose up -d --build
+      - run:
+          name: mod download
+          command: docker-compose exec app make mod-download
+      - run:
+          name: make lint
+          command: docker-compose exec app make lint
+      - run:
+          name: wait for postgresql
+          command: sleep 10
+      # TODO: DB設計が完了してからコメントアウト外す
+      # - run:
+          # name: make migrate load-initial_data load-dev_dummy_data
+          # command: docker-compose exec app make migrate load-initial_data load-dev_dummy_data
+      # TODO: API実装したらコメントアウト外す
+      # - run:
+          # name: validate openapi
+          # command: ./hack/openapi/validate_is_openapi_generator_executed.sh
+      # - run:
+          # name: make test
+          # command: docker-compose exec app make test
+      - store_artifacts:
+          path: coverage.html
+          destination: coverage.html
+      # TODO: カバレッジレポート出力が確認できてから設定する
+      # - run:
+          # name: coverage report
+          # command: |
+            # curl -s -S -X POST \
+                  # -d "{'channel': '#pb_zerp_notice', 'username': 'coverage-report', 'text': ':circleci: coverage report: <https://$CIRCLE_BUILD_NUM-179626768-gh.circle-artifacts.com/0/coverage.html|open report :earth_asia: >(build $CIRCLE_BUILD_NUM)' }" \
+                  # $SLACK_NOTICE_HOOK >/dev/null
+workflows:
+  version: 2
+  build-test:
+    jobs:
+      - test-all
