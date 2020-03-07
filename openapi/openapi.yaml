@@ -107,12 +107,12 @@ paths:
       operationId: login
       parameters:
         - in: query
-          name: email
-          description: Email
+          name: user_name
+          description: ユーザ名
           required: true
           schema:
             type: string
-            example: 'test@example.com'
+            example: 'LeBron'
         - in: query
           name: password
           description: Password
@@ -952,5 +952,4 @@ components:
           type: string
           example: 'Something Internal Server Error'
       required:
-        - message
-        
+        - message    

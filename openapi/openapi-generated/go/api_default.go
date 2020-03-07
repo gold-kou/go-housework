@@ -276,9 +276,9 @@ func (c *DefaultApiController) ListTasks(w http.ResponseWriter, r *http.Request)
 // Login - ログインAPI
 func (c *DefaultApiController) Login(w http.ResponseWriter, r *http.Request) { 
 	query := r.URL.Query()
-	email := query.Get("email")
+	userName := query.Get("userName")
 	password := query.Get("password")
-	result, err := c.service.Login(email, password)
+	result, err := c.service.Login(userName, password)
 	if err != nil {
 		w.WriteHeader(500)
 		return
