@@ -1,8 +1,8 @@
 create table "users"
 (
     id          serial constraint pk_users primary key,
-    name        varchar(255) not null,
-    email       varchar(255) not null,
+    name        varchar(255) unique not null,
+    email       varchar(255) unique not null,
     password    varchar(255) not null,
     created_at  timestamp with time zone not null default current_timestamp,
     updated_at  timestamp with time zone not null default current_timestamp
