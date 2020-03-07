@@ -95,7 +95,7 @@ func (s *DefaultApiService) ListTasks(date string) (interface{}, error) {
 }
 
 // Login - ログインAPI
-func (s *DefaultApiService) Login(email string, password string) (interface{}, error) {
+func (s *DefaultApiService) Login(userName string, password string) (interface{}, error) {
 	// TODO - update Login with the required logic for this service method.
 	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	return nil, errors.New("service method 'Login' not implemented")
