@@ -12,10 +12,6 @@ package schemamodel
 // ResponseDeleteFamilyMember - 世帯メンバ削除APIの正常系レスポンススキーマ
 type ResponseDeleteFamilyMember struct {
 
-	Family Family `json:"family"`
-
-	Member Member `json:"member"`
-
 	// HTTPレスポンスメッセージ
 	Message string `json:"message"`
 }

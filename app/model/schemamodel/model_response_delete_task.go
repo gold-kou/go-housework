@@ -12,8 +12,6 @@ package schemamodel
 // ResponseDeleteTask - 世帯メンバ削除APIの正常系レスポンススキーマ
 type ResponseDeleteTask struct {
 
-	Task Task `json:"task"`
-
 	// HTTPレスポンスメッセージ
 	Message string `json:"message"`
 }

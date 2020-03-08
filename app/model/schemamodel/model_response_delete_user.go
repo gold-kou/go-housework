@@ -12,8 +12,6 @@ package schemamodel
 // ResponseDeleteUser - ユーザ削除APIの正常系レスポンススキーマ
 type ResponseDeleteUser struct {
 
-	User User `json:"user"`
-
 	// HTTPレスポンスメッセージ
 	Message string `json:"message"`
 }
