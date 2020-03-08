@@ -38,5 +38,6 @@ Go/OpenAPI(Swagger)/Nginx/PostgreSQL/Docker/CircleCI/Gitなど
 - CloudFormationを使ったインフラ構築
 - デプロイパイプラインの構築
 - React+TypeScriptを使ったフロントエンド開発
+- ゲストユーザでのログイン機能（各種操作権限無し）
 - スマートスピーカーを使ったUIの追加
 - サービスの一般リリース
