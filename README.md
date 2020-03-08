@@ -39,5 +39,6 @@ Go/OpenAPI(Swagger)/Nginx/PostgreSQL/Docker/CircleCI/Gitなど
 - デプロイパイプラインの構築
 - React+TypeScriptを使ったフロントエンド開発
 - ゲストユーザでのログイン機能（各種操作権限無し）
+- パスワード変更機能
 - スマートスピーカーを使ったUIの追加
 - サービスの一般リリース
