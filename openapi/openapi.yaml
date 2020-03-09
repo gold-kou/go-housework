@@ -119,7 +119,7 @@ paths:
           required: true
           schema:
             type: string
-            example: '1234'
+            example: '123456'
       responses:
         '200':
           description: Success Response
@@ -771,12 +771,12 @@ components:
       description: ログインAPIの正常系レスポンススキーマ
       type: object
       properties:
-        message:
-          description: HTTPレスポンスメッセージ
+        token:
+          description: token
           type: string
-          example: 'Login successed.'
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODM3MTk3NjksImlhdCI6IjIwMjAtMDMtMDhUMTE6MDk6MjkuMDE2MzM2MSswOTowMCIsIm5hbWUiOiJ0ZXN0In0.8sQAEQvUIRnweEeGZ2polPNl79qOona81KKDe3XSJ7E'
       required:
-        - message
+        - token
     ResponseCreateFamily:
       description: 世帯登録APIの正常系レスポンススキーマ
       type: object

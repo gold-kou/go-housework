@@ -8,6 +8,7 @@ type Task struct {
 	Name      string `gorm:"column:name"`
 	MemberID  uint64 `gorm:"column:member_id"`
 	Status    string `gorm:"column:status"`
+	Date      string `gorm:"column:date"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

@@ -6,6 +6,7 @@ import "time"
 type MemberFamily struct {
 	MemberID  uint64 `gorm:"primary_key,column:member_id"`
 	FamilyID  uint64 `gorm:"primary_key,column:family_id"`
+	Role      string `gorm:"column:role"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
