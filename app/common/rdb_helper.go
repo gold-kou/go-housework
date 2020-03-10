@@ -1,39 +1,36 @@
 package common
 
 import (
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
-	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
-// MockDB DBモックのヘルパー関数。
-// 例：
-// MockDB(func(db *gorm.DB, mock sqlmock.Sqlmock) {
-// 	mock.ExpectExec(regexp.QuoteMeta(`INSERT INTO "order_item_measurement" ("key","value","created_at","updated_at","order_item_id") VALUES (?,?,?,?,?)`)).
-// 		WithArgs("neckline", 21.0, &testNow, &testNow, 1).
-// 		WillReturnResult(sqlmock.NewResult(1, 1))
-// 	err := createOrderItemMeasurement(db, "neckline", 21, 1)
-// 	assert.NoError(err)
-// 	assert.NoError(mock.ExpectationsWereMet())
-// })
-func MockDB(mockFunc func(db *gorm.DB, mock sqlmock.Sqlmock)) {
+// MockDB Helper for DB mock
+// "`sqlmock` is not officially supported, running under compatibility mode." should be ignored
+func MockDB(t *testing.T, mockFunc func(db *gorm.DB, mock sqlmock.Sqlmock)) {
+	// connect to not real db but sqlmock
 	db, mock, _ := sqlmock.New()
 	defer db.Close()
-	// テスト実行時、「`sqlmock` is not officially supported, running under compatibility mode.」
-	// という警告が出るがsqlmockを使用しているために発生しているものなので無視している
 	gdb, _ := gorm.Open("sqlmock", db)
 	defer gdb.Close()
 	mockFunc(gdb, mock)
+
+	t.Helper()
+	assert := assert.New(t)
+	assert.NoError(mock.ExpectationsWereMet())
 }
 
-// Transact DBトランザクションのヘルパー関数。
-// 例:
+// Transact Helper for DB transaction
+// ex:
 // err := common.Transact(func(tx *gorm.DB) (err error) {
-//   // トランザクション内のハンドリング
+//   // something
 //   return
 // })
 // if err != nil {
-//   // エラーハンドリング
+//   // error handling
 // }
 func Transact(txFunc func(*gorm.DB) error) (err error) {
 	if db == nil {

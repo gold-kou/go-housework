@@ -8,7 +8,6 @@ const lockNotAvailable = pq.ErrorCode("55P03")
 // BadRequestError represents error of bad request
 type BadRequestError struct {
 	Message string
-	Errors  []map[string]string
 }
 
 // AuthorizationError represents error of authorization
@@ -35,7 +34,6 @@ type InternalServerError struct {
 func NewBadRequestError(message string, errors ...map[string]string) *BadRequestError {
 	return &BadRequestError{
 		Message: message,
-		Errors:  errors,
 	}
 }
 
@@ -74,34 +72,4 @@ func NewInternalServerError(message string) *InternalServerError {
 
 func (i *InternalServerError) Error() string {
 	return i.Message
-}
-
-// IsDuplicateKeyError returns true if err is uniqueViolation
-func IsDuplicateKeyError(err error) bool {
-	switch e := err.(type) {
-	case nil:
-		return false
-	case *pq.Error:
-		if e.Code == uniqueViolation {
-			return true
-		}
-		return false
-	default:
-		return false
-	}
-}
-
-// IsLockNotAvailableError returns true if err is lockNotAvailable
-func IsLockNotAvailableError(err error) bool {
-	switch e := err.(type) {
-	case nil:
-		return false
-	case *pq.Error:
-		if e.Code == lockNotAvailable {
-			return true
-		}
-		return false
-	default:
-		return false
-	}
 }

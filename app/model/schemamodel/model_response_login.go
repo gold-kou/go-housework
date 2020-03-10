@@ -12,6 +12,6 @@ package schemamodel
 // ResponseLogin - ログインAPIの正常系レスポンススキーマ
 type ResponseLogin struct {
 
-	// HTTPレスポンスメッセージ
-	Message string `json:"message"`
+	// token
+	Token string `json:"token"`
 }

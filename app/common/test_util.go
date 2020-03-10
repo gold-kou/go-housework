@@ -8,6 +8,16 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+const (
+	TestUserID         = 1
+	TestUserName       = "test"
+	TestPassword       = "123456"
+	TestWrongPassword  = "wrongpassword"
+	TestHashedPassword = "$2a$10$sSZRLWLaKu2JxPz9zpNjxek3N9UWMA82pyiEWoI1yXA.IE7KcMxTq"
+	TestEmail          = "test@example.com"
+	TestSecretKey      = "test_secret_key"
+)
+
 // SetTime sets global time
 func SetTime(t time.Time) {
 	NowFunc = func() time.Time { return t }
@@ -21,7 +31,7 @@ func SetTestTime() {
 // GetTestTime returns time of TestTime
 func GetTestTime() time.Time {
 	loc, _ := time.LoadLocation("Asia/Tokyo")
-	return time.Date(2018, time.May, 21, 23, 0, 0, 0, loc)
+	return time.Date(2020, time.January, 1, 19, 0, 0, 0, loc)
 }
 
 // ResetTime resets global time
@@ -44,9 +54,13 @@ func ResetGormTime() {
 	gorm.NowFunc = time.Now
 }
 
-// IntToPtr returns pointer of int
-func IntToPtr(i int) *int {
-	return &i
+// AnyTime only asserts that argument is of time.Time type.
+type AnyTime struct{}
+
+// Match satisfies sqlmock.Argument interface
+func (a AnyTime) Match(v driver.Value) bool {
+	_, ok := v.(time.Time)
+	return ok
 }
 
 // SetTestEnv sets temporarily environment variable for test
@@ -56,13 +70,4 @@ func SetTestEnv(key, val string) func() {
 	return func() {
 		os.Setenv(key, preVal)
 	}
-}
-
-// AnyTime only asserts that argument is of time.Time type.
-type AnyTime struct{}
-
-// Match satisfies sqlmock.Argument interface
-func (a AnyTime) Match(v driver.Value) bool {
-	_, ok := v.(time.Time)
-	return ok
 }

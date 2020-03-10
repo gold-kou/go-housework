@@ -10,9 +10,10 @@ jobs:
       - run:
           name: mod download
           command: docker-compose exec app make mod-download
-      - run:
-          name: make lint
-          command: docker-compose exec app make lint
+# TODO 戻す
+#      - run:
+#          name: make lint
+#          command: docker-compose exec app make lint
       - run:
           name: wait for postgresql
           command: sleep 10

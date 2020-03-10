@@ -30,7 +30,7 @@ services:
       POSTGRES_PASSWORD: "admin!"
       POSTGRES_HOST: "db"
       POSTGRES_PORT: "5432"
-      JWT_SECRET_KEY: "8g3kmNELd0t2wLpsRygsBUNfb3byvSjK"
+      JWT_SECRET_KEY: "samplekey"
       RUNSERVER: "LOCAL" # [LOCAL, STAGING, PRODUCTION]
     volumes:
       - ".:/go/src/github.com/gold-kou/go-housework"
