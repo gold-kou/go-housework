@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"github.com/gold-kou/go-housework/app/common"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/gold-kou/go-housework/app/common"
+	"github.com/stretchr/testify/assert"
 )
 
 var sharedTestToken string

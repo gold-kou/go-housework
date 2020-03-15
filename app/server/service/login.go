@@ -31,6 +31,7 @@ func NewLogin(tx *gorm.DB, userName string, password string, userRepo repository
 	}
 }
 
+// Execute service main process
 func (l *Login) Execute() (string, error) {
 	// ユーザ名からユーザ情報の取得
 	user, err := l.userRepo.GetUserWhereUsername(l.userName)

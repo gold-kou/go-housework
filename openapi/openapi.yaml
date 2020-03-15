@@ -799,14 +799,8 @@ components:
       properties:
         family:
           $ref: '#/components/schemas/Family'
-        members:
-          description: 家族メンバ情報の集合
-          type: array
-          items:
-            $ref: '#/components/schemas/Member'
       required:
         - family
-        - members
     ResponseDeleteFamily:
       description: 世帯削除APIの正常系レスポンススキーマ
       type: object

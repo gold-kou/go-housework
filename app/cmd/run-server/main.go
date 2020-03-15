@@ -1,11 +1,12 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gold-kou/go-housework/app/common"
 	"github.com/gold-kou/go-housework/app/server"
 	"github.com/gold-kou/go-housework/app/server/middleware"
 	log "github.com/sirupsen/logrus"
-	"net/http"
 )
 
 func main() {

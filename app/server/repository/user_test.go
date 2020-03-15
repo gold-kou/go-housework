@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"os"
 	"regexp"
 	"testing"
 
@@ -12,6 +13,11 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
 )
+
+// TestMain prepare common test setting
+func TestMain(m *testing.M) {
+	os.Exit(common.RunTestMain(m))
+}
 
 func TestUserRepository_InsertUser(t *testing.T) {
 	type args struct {
@@ -75,12 +81,6 @@ func TestUserRepository_InsertUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// set test time
-			common.SetTestTime()
-			defer common.ResetTime()
-			common.SetGormTestTime()
-			defer common.ResetGormTime()
-
 			assert := assert.New(t)
 			common.MockDB(t, func(db *gorm.DB, mock sqlmock.Sqlmock) {
 				tt.dbMockFunc(mock)
@@ -98,6 +98,56 @@ func TestUserRepository_InsertUser(t *testing.T) {
 				} else {
 					assert.NoError(err)
 					assert.Equal(tt.want, tt.args.u)
+				}
+			})
+		})
+	}
+}
+
+func TestUserRepository_GetUserWhereUserID(t *testing.T) {
+	type args struct {
+		userID uint64
+	}
+	tests := []struct {
+		name       string
+		dbMockFunc func(mock sqlmock.Sqlmock)
+		args       args
+		want       *db.User
+		wantErr    bool
+		wantErrMsg string
+	}{
+		{
+			name: "success",
+			dbMockFunc: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE (id = ?)`)).
+					WithArgs(common.TestUserID).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "name", "email", "password", "created_at", "updated_at"}).
+						AddRow(common.TestUserID, common.TestUserName, common.TestEmail, common.TestPassword, common.GetGormTestTime(), common.GetGormTestTime()))
+			},
+			args:    args{userID: common.TestUserID},
+			want:    &db.User{ID: common.TestUserID, Name: common.TestUserName, Password: common.TestPassword, Email: common.TestEmail, CreatedAt: common.GetTestTime(), UpdatedAt: common.GetTestTime()},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert := assert.New(t)
+			common.MockDB(t, func(db *gorm.DB, mock sqlmock.Sqlmock) {
+				tt.dbMockFunc(mock)
+				r := &UserRepository{
+					db: db,
+				}
+
+				// test target function
+				got, err := r.GetUserWhereUserID(tt.args.userID)
+
+				// assert
+				if tt.wantErr {
+					assert.Error(err)
+					assert.Equal(tt.wantErrMsg, err.Error())
+				} else {
+					assert.NoError(err)
+					assert.Equal(tt.want, got)
 				}
 			})
 		})
@@ -131,12 +181,6 @@ func TestUserRepository_GetUserWhereUsername(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// fix test time
-			common.SetTestTime()
-			defer common.ResetTime()
-			common.SetGormTestTime()
-			defer common.ResetGormTime()
-
 			assert := assert.New(t)
 			common.MockDB(t, func(db *gorm.DB, mock sqlmock.Sqlmock) {
 				tt.dbMockFunc(mock)
@@ -189,12 +233,6 @@ func TestUserRepository_DeleteUserWhereUsername(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// set test time
-			common.SetTestTime()
-			defer common.ResetTime()
-			common.SetGormTestTime()
-			defer common.ResetGormTime()
-
 			assert := assert.New(t)
 			common.MockDB(t, func(db *gorm.DB, mock sqlmock.Sqlmock) {
 				tt.dbMockFunc(mock)

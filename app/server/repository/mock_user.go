@@ -75,3 +75,18 @@ func (mr *MockUserRepositoryInterfaceMockRecorder) DeleteUserWhereUsername(arg0 
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserWhereUsername", reflect.TypeOf((*MockUserRepositoryInterface)(nil).DeleteUserWhereUsername), arg0)
 }
+
+// GetUserWhereUserID mocks base method
+func (m *MockUserRepositoryInterface) GetUserWhereUserID(arg0 uint64) (*db.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserWhereUserID", arg0)
+	ret0, _ := ret[0].(*db.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserWhereUserID indicates an expected call of GetUserWhereUserID
+func (mr *MockUserRepositoryInterfaceMockRecorder) GetUserWhereUserID(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserWhereUserID", reflect.TypeOf((*MockUserRepositoryInterface)(nil).GetUserWhereUserID), arg0)
+}

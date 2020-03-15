@@ -3,20 +3,46 @@ package common
 import (
 	"database/sql/driver"
 	"os"
+	"testing"
 	"time"
 
 	"github.com/jinzhu/gorm"
 )
 
 const (
-	TestUserID         = 1
-	TestUserName       = "test"
-	TestPassword       = "123456"
-	TestWrongPassword  = "wrongpassword"
+	// TestUserID TestUserID
+	TestUserID = 1
+	// TestUserID2 TestUserID2
+	TestUserID2 = 2
+	// TestUserName TestUserName
+	TestUserName = "test-user"
+	// TestPassword TestPassword
+	TestPassword = "123456"
+	// TestWrongPassword TestWrongPassword
+	TestWrongPassword = "wrongpassword"
+	// TestHashedPassword TestHashedPassword
 	TestHashedPassword = "$2a$10$sSZRLWLaKu2JxPz9zpNjxek3N9UWMA82pyiEWoI1yXA.IE7KcMxTq"
-	TestEmail          = "test@example.com"
-	TestSecretKey      = "test_secret_key"
+	// TestEmail TestEmail
+	TestEmail = "test@example.com"
+	// TestFamilyID TestFamilyID
+	TestFamilyID = 1
+	// TestFamilyName TestFamilyName
+	TestFamilyName = "test-family"
+	// TestSecretKey TestSecretKey
+	TestSecretKey = "test_secret_key"
 )
+
+// RunTestMain runs tests with setups
+func RunTestMain(m *testing.M) int {
+	// テスト用の時間を設定する
+	SetTestTime()
+	defer ResetTime()
+	SetGormTestTime()
+	defer ResetGormTime()
+
+	// テスト結果を返す
+	return m.Run()
+}
 
 // SetTime sets global time
 func SetTime(t time.Time) {
