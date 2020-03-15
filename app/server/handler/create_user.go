@@ -2,74 +2,75 @@ package handler
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"net/http"
-
 	"github.com/gold-kou/go-housework/app/common"
-	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
 	"github.com/gold-kou/go-housework/app/server/repository"
 	"github.com/gold-kou/go-housework/app/server/service"
 	"github.com/jinzhu/gorm"
+	"io/ioutil"
+	"net/http"
+
 	log "github.com/sirupsen/logrus"
 )
 
-// CreateUser handler
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	// get request parameter
-	var createUser schemamodel.RequestCreateUser
+	common.Transact(func(tx *gorm.DB) error {
+		userRepo := repository.NewUserRepository(tx)
+		c := Controller{srv: service.NewCreateUser(userRepo)}
+		res, status, err := c.CreateUser(w, r)
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(status)
+		if encodeErr := json.NewEncoder(w).Encode(res); encodeErr != nil {
+			log.Error(encodeErr)
+			panic(encodeErr.Error())
+		}
+		return err
+	})
+}
+
+type Controller struct {
+	srv service.CreateUserServiceInterface
+}
+
+func (c *Controller) CreateUser(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Warn(err)
-		common.ResponseBadRequest(w, err.Error())
-		return
+		return schemamodel.ResponseBadRequest{Message: err.Error()}, http.StatusBadRequest, err
 	}
 	defer r.Body.Close()
-	if err := json.Unmarshal(b, &createUser); err != nil {
+
+	var user schemamodel.RequestCreateUser
+	if err := json.Unmarshal(b, &user); err != nil {
 		log.Warn(err)
-		common.ResponseBadRequest(w, err.Error())
-		return
+		return schemamodel.ResponseBadRequest{Message: err.Error()}, http.StatusBadRequest, err
 	}
 
 	// validation
-	if err := createUser.ValidateParam(); err != nil {
+	if err := user.ValidateParam(); err != nil {
 		log.Warn(err)
-		common.ResponseBadRequest(w, err.Error())
-		return
+		return schemamodel.ResponseBadRequest{Message: err.Error()}, http.StatusBadRequest, err
 	}
 
 	// service layer
-	var u *db.User
-	err = common.Transact(func(tx *gorm.DB) (err error) {
-		userRepo := repository.NewUserRepository(tx)
-		u, err = service.NewCreateUser(tx, &createUser, userRepo).Execute()
-		return
-	})
+	u, err := c.srv.Execute(&user)
 
 	// error handling
 	switch err := err.(type) {
 	case nil:
 	case *common.BadRequestError:
 		log.Warn(err)
-		common.ResponseBadRequest(w, err.Message)
-		return
+		return schemamodel.ResponseBadRequest{Message: err.Error()}, http.StatusBadRequest, err
 	case *common.AuthorizationError:
 		log.Warn(err)
-		common.ResponseUnauthorized(w, err.Message)
-		return
+		return schemamodel.ResponseUnauthorized{Message: err.Error()}, http.StatusUnauthorized, err
 	default:
 		log.Error(err)
-		common.ResponseInternalServerError(w, err.Error())
-		return
+		return schemamodel.ResponseInternalServerError{Message: err.Error()}, http.StatusInternalServerError, err
 	}
 
-	// http response
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(&schemamodel.ResponseCreateUser{
+	return schemamodel.ResponseCreateUser{
 		User:    schemamodel.User{UserId: int64(u.ID), UserName: u.Name},
-		Message: "new user created"}); err != nil {
-		log.Error(err)
-		panic(err)
-	}
+		Message: "new user created",
+	}, http.StatusOK, nil
 }

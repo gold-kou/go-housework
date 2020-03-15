@@ -1,20 +1,20 @@
 package service
 
 import (
-	"testing"
-
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/golang/mock/gomock"
 	"github.com/gold-kou/go-housework/app/common"
+	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
 	"github.com/gold-kou/go-housework/app/server/repository"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestCreateUser_Execute(t *testing.T) {
 	type args struct {
-		//user *db.User
+		user *db.User
 	}
 	tests := []struct {
 		name             string
@@ -50,7 +50,7 @@ func TestCreateUser_Execute(t *testing.T) {
 
 				// run target method
 				reqCreateUser := &schemamodel.RequestCreateUser{UserName: common.TestUserName, Email: common.TestEmail, Password: common.TestPassword}
-				_, err := NewCreateUser(db, reqCreateUser, userRepo).Execute()
+				_, err := NewCreateUser(userRepo).Execute(reqCreateUser)
 
 				// assert
 				assert := assert.New(t)
