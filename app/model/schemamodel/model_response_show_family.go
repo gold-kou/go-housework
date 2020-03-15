@@ -13,7 +13,4 @@ package schemamodel
 type ResponseShowFamily struct {
 
 	Family Family `json:"family"`
-
-	// 家族メンバ情報の集合
-	Members []Member `json:"members"`
 }

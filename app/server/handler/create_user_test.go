@@ -1,15 +1,16 @@
 package handler
 
 import (
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/golang/mock/gomock"
-	"github.com/gold-kou/go-housework/app/server/service"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/golang/mock/gomock"
+	"github.com/gold-kou/go-housework/app/server/service"
+	"github.com/stretchr/testify/assert"
 )
 
 var successCreateUserReq = `

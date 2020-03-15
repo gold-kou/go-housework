@@ -29,6 +29,7 @@ func NewCreateUser(tx *gorm.DB, createUser *schemamodel.RequestCreateUser, userR
 	}
 }
 
+// Execute service main process
 func (u *CreateUser) Execute() (*db.User, error) {
 	// data
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.createUser.Password), bcrypt.DefaultCost)

@@ -1,5 +1,8 @@
 package service
 
+// TODO test
+
+/*
 import (
 	"testing"
 
@@ -7,36 +10,25 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/gold-kou/go-housework/app/common"
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
+	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateUser_Execute(t *testing.T) {
+func TestCreateFamily_Execute(t *testing.T) {
 	type args struct {
-		//user *db.User
+		auth *middleware.Auth
 	}
 	tests := []struct {
-		name             string
-		mockUserRepoFunc func(*repository.MockUserRepositoryInterface)
-		args             args
-		wantErr          bool
-		wantErrMsg       string
+		name                     string
+		mockUserRepoFunc         func(*repository.MockUserRepositoryInterface)
+		mockFamilyRepoFunc       func(*repository.MockFamilyRepositoryInterface)
+		mockMemberFamilyRepoFunc func(*repository.MockMemberFamilyRepositoryInterface)
+		args                     args
+		wantErr                  bool
+		wantErrMsg               string
 	}{
-		/*
-			// TODO because of bcrypt randam
-			{
-				name: "success",
-				mockUserRepoFunc: func(r *repository.MockUserRepositoryInterface) {
-					r.EXPECT().
-						InsertUser(&db.User{}).
-						Return(nil)
-				},
-				args: args{user: &db.User{Name: common.TestUserName, Email: common.TestEmail, Password: common.TestPassword}},
-				wantErr: false,
-			},
-
-		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -47,10 +39,14 @@ func TestCreateUser_Execute(t *testing.T) {
 				defer ctrl.Finish()
 				userRepo := repository.NewMockUserRepositoryInterface(ctrl)
 				tt.mockUserRepoFunc(userRepo)
+				familyRepo := repository.NewMockFamilyRepositoryInterface(ctrl)
+				tt.mockFamilyRepoFunc(familyRepo)
+				memberFamilyRepo := repository.NewMockMemberFamilyRepositoryInterface(ctrl)
+				tt.mockMemberFamilyRepoFunc(memberFamilyRepo)
 
 				// run target method
-				reqCreateUser := &schemamodel.RequestCreateUser{UserName: common.TestUserName, Email: common.TestEmail, Password: common.TestPassword}
-				_, err := NewCreateUser(db, reqCreateUser, userRepo).Execute()
+				reqCreateFamily := &schemamodel.RequestCreateFamily{FamilyName: common.TestFamilyName}
+				_, err := NewCreateFamily(db, reqCreateFamily, familyRepo, userRepo, *memberFamilyRepo).Execute(tt.args.auth)
 
 				// assert
 				assert := assert.New(t)
@@ -65,3 +61,4 @@ func TestCreateUser_Execute(t *testing.T) {
 		})
 	}
 }
+*/

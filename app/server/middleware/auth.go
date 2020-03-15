@@ -1,14 +1,15 @@
 package middleware
 
 import (
-	"github.com/gold-kou/go-housework/app/common"
 	"os"
 	"time"
+
+	"github.com/gold-kou/go-housework/app/common"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-// Auth
+// Auth struct
 type Auth struct {
 	UserName string
 }

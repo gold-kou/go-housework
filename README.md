@@ -44,3 +44,10 @@ Go/OpenAPI(Swagger)/Nginx/PostgreSQL/Docker/CircleCI/Gitなど
 - パスワード変更機能
 - スマートスピーカーを使ったUIの追加
 - サービスの一般リリース
+
+# develop info
+## mockgenの例
+```
+$ cd app/server/repository
+$ mockgen -source user.go -destination mock_user.go -package repository
+```

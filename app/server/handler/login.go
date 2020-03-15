@@ -2,12 +2,13 @@ package handler
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/gold-kou/go-housework/app/common"
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
 	"github.com/gold-kou/go-housework/app/server/repository"
 	"github.com/gold-kou/go-housework/app/server/service"
 	"github.com/jinzhu/gorm"
-	"net/http"
 
 	log "github.com/sirupsen/logrus"
 )
