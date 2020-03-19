@@ -36,7 +36,7 @@ func (f *FamilyRepository) InsertFamily(family *db.Family) error {
 
 // UpdateFamily update family
 func (f *FamilyRepository) UpdateFamily(family *db.Family) error {
-	if err := f.db.Save(&family).Error; err != nil {
+	if err := f.db.Save(family).Error; err != nil {
 		return common.NewInternalServerError(err.Error())
 	}
 	return nil

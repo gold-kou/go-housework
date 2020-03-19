@@ -11,8 +11,8 @@ type MemberFamilyRepositoryInterface interface {
 	InsertMemberFamily(*db.MemberFamily) error
 	DeleteMemberFamily(uint64) error
 	DeleteMemberFromFamily(uint64) error
-	GetMemberFamilyWhereMemberID(uint64) (db.MemberFamily, error)
-	GetMemberFamiliesWhereFamilyID(uint64) ([]db.MemberFamily, error)
+	GetMemberFamilyWhereMemberID(uint64) (*db.MemberFamily, error)
+	ListMemberFamiliesWhereFamilyID(uint64) ([]*db.MemberFamily, error)
 }
 
 // MemberFamilyRepository is a repository of memberFamily
@@ -59,10 +59,12 @@ func (mf *MemberFamilyRepository) GetMemberFamilyWhereMemberID(memberID uint64) 
 	if err := mf.db.Where("member_id = ?", memberID).Find(&memberFamily).Error; err != nil {
 		// empty is not error
 		if err == gorm.ErrRecordNotFound {
-			return &memberFamily, nil
+			return nil, nil
 		}
+		// unexpected error
 		return &memberFamily, common.NewInternalServerError(err.Error())
 	}
+	// not empty
 	return &memberFamily, nil
 }
 

@@ -24,6 +24,10 @@ func DeleteFamily(w http.ResponseWriter, r *http.Request) {
 
 	// verify jwt
 	authUser, err := middleware.VerifyToken(bearerToken)
+	if err != nil {
+		common.ResponseUnauthorized(w, err.Error())
+		return
+	}
 
 	// service layer
 	err = common.Transact(func(tx *gorm.DB) (err error) {

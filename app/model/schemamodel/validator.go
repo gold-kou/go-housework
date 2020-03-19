@@ -20,6 +20,11 @@ const (
 	MaxFamilyNameLength = 100
 )
 
+// RequestSchemaModel represents interface of request schema
+type RequestSchemaModel interface {
+	ValidateParam() error
+}
+
 // ValidateParam validation
 func (cu *RequestCreateUser) ValidateParam() error {
 	var fieldRules []*validation.FieldRules
@@ -60,7 +65,7 @@ func (rct *RequestCreateTask) ValidateParam() error {
 	fieldRules = append(fieldRules, validation.Field(&rct.TaskName, validation.Required))
 	fieldRules = append(fieldRules, validation.Field(&rct.MemberName, validation.Required))
 	fieldRules = append(fieldRules, validation.Field(&rct.Status, validation.Required, validation.In("todo", "done")))
-	fieldRules = append(fieldRules, validation.Field(&rct.Date, validation.Required, validation.Date("2018-01-01")))
+	fieldRules = append(fieldRules, validation.Field(&rct.Date, validation.Required, validation.Date("2006-01-02")))
 	return validation.ValidateStruct(rct, fieldRules...)
 }
 
@@ -68,10 +73,10 @@ func (rct *RequestCreateTask) ValidateParam() error {
 func (rut *RequestUpdateTask) ValidateParam() error {
 	var fieldRules []*validation.FieldRules
 	fieldRules = append(fieldRules, validation.Field(&rut.Task, validation.Required))
-	fieldRules = append(fieldRules, validation.Field(&rut.Task.TaskId, validation.Required))
-	fieldRules = append(fieldRules, validation.Field(&rut.Task.TaskName, validation.Required))
-	fieldRules = append(fieldRules, validation.Field(&rut.Task.MemberName, validation.Required))
-	fieldRules = append(fieldRules, validation.Field(&rut.Task.Status, validation.Required, validation.In("todo", "done")))
-	fieldRules = append(fieldRules, validation.Field(&rut.Task.Date, validation.Required, validation.Date("2018-01-01")))
+	// fieldRules = append(fieldRules, validation.Field(&rut.Task.TaskId, validation.Required))
+	// fieldRules = append(fieldRules, validation.Field(&rut.Task.TaskName, validation.Required))
+	// fieldRules = append(fieldRules, validation.Field(&rut.Task.MemberName, validation.Required))
+	// fieldRules = append(fieldRules, validation.Field(&rut.Task.Status, validation.Required, validation.In("todo", "done")))
+	// fieldRules = append(fieldRules, validation.Field(&rut.Task.Date, validation.Required, validation.Date("2006-01-02")))
 	return validation.ValidateStruct(rut, fieldRules...)
 }

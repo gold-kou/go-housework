@@ -99,29 +99,29 @@ var routes = Routes{
 		strings.ToUpper("Get"),
 		"/family/members",
 		handler.ListFamilyMembers,
-	}, /*
-		{
-			"CreateTask",
-			strings.ToUpper("Post"),
-			"/task",
-			handler.CreateTask,
-		},
-		{
-			"UpdateTask",
-			strings.ToUpper("Put"),
-			"/task",
-			handler.UpdateTask,
-		},
-		{
-			"DeleteTask",
-			strings.ToUpper("Delete"),
-			"/task/{task_id}",
-			handler.DeleteTask,
-		},
-		{
-			"ListTasks",
-			strings.ToUpper("Get"),
-			"/tasks",
-			handler.ListTasks,
-		},*/
+	},
+	{
+		"CreateTask",
+		strings.ToUpper("Post"),
+		"/task",
+		handler.CreateTask,
+	},
+	{
+		"UpdateTask",
+		strings.ToUpper("Put"),
+		"/task",
+		handler.UpdateTask,
+	},
+	{
+		"DeleteTask",
+		strings.ToUpper("Delete"),
+		"/task/{task_id}",
+		handler.DeleteTask,
+	},
+	{
+		"ListTasks",
+		strings.ToUpper("Get"),
+		"/tasks",
+		handler.ListTasks,
+	},
 }

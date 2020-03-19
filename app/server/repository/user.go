@@ -12,6 +12,7 @@ type UserRepositoryInterface interface {
 	GetUserWhereUsername(string) (*db.User, error)
 	DeleteUserWhereUsername(string) error
 	GetUserWhereUserID(uint64) (*db.User, error)
+	GetUsersWhereUserIDs([]uint64) ([]*db.User, error)
 }
 
 // UserRepository is a repository of user
@@ -41,6 +42,19 @@ func (u *UserRepository) GetUserWhereUserID(userID uint64) (*db.User, error) {
 		return &db.User{}, common.NewInternalServerError(err.Error())
 	}
 	return &user, nil
+}
+
+// GetUsersWhereUserIDs returns users
+func (u *UserRepository) GetUsersWhereUserIDs(userIDs []uint64) ([]*db.User, error) {
+	var users []*db.User
+	for _, id := range userIDs {
+		var user db.User
+		if err := u.db.Where("id = ?", id).Find(&user).Error; err != nil {
+			return nil, common.NewInternalServerError(err.Error())
+		}
+		users = append(users, &user)
+	}
+	return users, nil
 }
 
 // GetUserWhereUsername returns user. returns nil if there is no record.

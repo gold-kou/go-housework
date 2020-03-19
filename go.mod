@@ -16,5 +16,4 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.2.2
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
-	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
 )

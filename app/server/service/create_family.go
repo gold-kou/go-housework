@@ -20,13 +20,13 @@ type CreateFamily struct {
 	createFamily     *schemamodel.RequestCreateFamily
 	familyRepo       repository.FamilyRepositoryInterface
 	userRepo         repository.UserRepositoryInterface
-	memberFamilyRepo repository.MemberFamilyRepository
+	memberFamilyRepo repository.MemberFamilyRepositoryInterface
 }
 
 // NewCreateFamily constructor
 func NewCreateFamily(tx *gorm.DB, createFamily *schemamodel.RequestCreateFamily,
 	familyRepo repository.FamilyRepositoryInterface, userRepo repository.UserRepositoryInterface,
-	memberFamilyRepo repository.MemberFamilyRepository) *CreateFamily {
+	memberFamilyRepo repository.MemberFamilyRepositoryInterface) *CreateFamily {
 	return &CreateFamily{
 		tx:               tx,
 		createFamily:     createFamily,
@@ -44,7 +44,7 @@ func (f *CreateFamily) Execute(auth *middleware.Auth) (*db.Family, error) {
 		return &db.Family{}, err
 	}
 
-	// check if the user already belongs to any families
+	// check if the user has already belonged to any families
 	mf, err := f.memberFamilyRepo.GetMemberFamilyWhereMemberID(user.ID)
 	if mf != nil {
 		return &db.Family{}, common.NewBadRequestError("the user has already belonged to another family")
