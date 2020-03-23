@@ -10,6 +10,7 @@ import (
 
 var sharedTestToken string
 
+// MEMO: Do not run this test func each because of sharedTestToken
 func TestGenerateToken(t *testing.T) {
 	type args struct {
 		userName string
@@ -52,7 +53,7 @@ func TestGenerateToken(t *testing.T) {
 	}
 }
 
-func TestVerifyToken(t *testing.T) {
+func Test_verifyToken(t *testing.T) {
 	type args struct {
 		tokenString string
 	}
@@ -75,7 +76,6 @@ func TestVerifyToken(t *testing.T) {
 			name:        "fail(expired)",
 			args:        args{tokenString: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODM3MjIzNjIsImlhdCI6IjIwMjAtMDMtMDhUMTE6NTI6NDIuMjIxMjY2NCswOTowMCIsIm5hbWUiOiJ0ZXN0In0.FYMJmXo17aUhTpdaLifMovDQ0BiKSq8LnssLwxFvshI"},
 			environment: common.TestSecretKey,
-			want:        &Auth{UserName: common.TestUserName},
 			wantErr:     true,
 			watnErrMsg:  "token is expired",
 		},
@@ -89,7 +89,7 @@ func TestVerifyToken(t *testing.T) {
 			assert := assert.New(t)
 
 			// test target
-			got, err := VerifyToken(tt.args.tokenString)
+			got, err := verifyToken(tt.args.tokenString)
 
 			// assert
 			if tt.wantErr {

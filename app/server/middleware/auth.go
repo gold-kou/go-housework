@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gold-kou/go-housework/app/common"
@@ -34,8 +36,24 @@ func GenerateToken(userName string) (tokenString string, err error) {
 	return tokenString, nil
 }
 
-// VerifyToken verify token and return user name
-func VerifyToken(tokenString string) (*Auth, error) {
+// VerifyHeaderToken verify token and get auth info
+func VerifyHeaderToken(r *http.Request) (*Auth, error) {
+	// get jwt from header
+	authHeader := r.Header.Get("Authorization")
+
+	// Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODM3MjIwNTMsImlhdCI6IjIwMjAtMDMtMDhUMTE6NDc6MzMuMTc4NjU5MyswOTowMCIsIm5hbWUiOiJ0ZXN0In0.YIyT1RJGcYbdynx1V4-6MhiosmTlHmKiyiG_GjxQeuw
+	bearerToken := strings.Split(authHeader, " ")[1]
+
+	// verify jwt
+	authUser, err := verifyToken(bearerToken)
+	if err != nil {
+		return nil, common.NewAuthorizationError(err.Error())
+	}
+	return authUser, nil
+}
+
+// verifyToken verify token and return user name
+func verifyToken(tokenString string) (*Auth, error) {
 	// verify
 	parsedToken, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// check signing method
