@@ -7,7 +7,7 @@
 ローカルでの動作確認までとなっております。あらかじめご了承ください。
 
 # サービス概要
-SmartHouseWork
+サービス名：SmartChores
 
 ご家庭の家事を管理するソフトウェアです。
 
@@ -16,11 +16,14 @@ SmartHouseWork
 「自分ばかりが家事をしている」と悩んでいませんか？
 まずは、「見える化」をしてみましょう！そこからパートナーへの相談に繋がります！
 
-# IF
-openapi/openapi.yamlをSwagger Editorなどでご確認ください。
+# 提供機能
+現在、アカウント管理・世帯管理・タスク管理などに関する約15個のAPIを用意しております。
 
 # 動かしてみる
 comming soon...
+
+# 技術スタック
+Go/OpenAPI(Swagger)/Nginx/PostgreSQL/Docker/CircleCI/Gitなど
 
 # このポートフォリオで証明できるスキル（現時点）
 - サービスの企画
@@ -33,19 +36,19 @@ comming soon...
 - Git操作
 - 認証・認可(JWT)
 
-# 技術スタック
-Go/OpenAPI(Swagger)/Nginx/PostgreSQL/Docker/CircleCI/Gitなど
-
 # 今後追加予定のもの
-- CloudFormationを使ったインフラ構築
+- IaCを使ったインフラ構築
 - デプロイパイプラインの構築
-- React+TypeScriptを使ったフロントエンド開発
+- React+TypeScriptを使ったSPAフロントエンド開発
 - ゲストユーザでのログイン機能（各種操作権限無し）
 - パスワード変更機能
 - スマートスピーカーを使ったUIの追加
 - サービスの一般リリース
 
-# develop info
+# for developers
+## IF
+openapi/openapi.yamlをSwagger Editorなどでご確認ください。
+
 ## mockgenの例
 ```
 $ cd app/server/repository
