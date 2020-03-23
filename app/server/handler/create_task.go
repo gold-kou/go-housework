@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"strings"
 
 	"github.com/gold-kou/go-housework/app/common"
 	"github.com/gold-kou/go-housework/app/model/db"
@@ -19,13 +18,8 @@ import (
 
 // CreateTask handler
 func CreateTask(w http.ResponseWriter, r *http.Request) {
-	// get jwt from header
-	authHeader := r.Header.Get("Authorization")
-	// Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODM3MjIwNTMsImlhdCI6IjIwMjAtMDMtMDhUMTE6NDc6MzMuMTc4NjU5MyswOTowMCIsIm5hbWUiOiJ0ZXN0In0.YIyT1RJGcYbdynx1V4-6MhiosmTlHmKiyiG_GjxQeuw
-	bearerToken := strings.Split(authHeader, " ")[1]
-
-	// verify jwt
-	authUser, err := middleware.VerifyToken(bearerToken)
+	// verify header token
+	authUser, err := middleware.VerifyHeaderToken(r)
 	if err != nil {
 		common.ResponseUnauthorized(w, err.Error())
 		return
