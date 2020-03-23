@@ -26,6 +26,10 @@ func CreateFamily(w http.ResponseWriter, r *http.Request) {
 
 	// verify jwt
 	authUser, err := middleware.VerifyToken(bearerToken)
+	if err != nil {
+		common.ResponseUnauthorized(w, err.Error())
+		return
+	}
 
 	// get request parameter
 	var createFamily schemamodel.RequestCreateFamily
@@ -55,7 +59,7 @@ func CreateFamily(w http.ResponseWriter, r *http.Request) {
 		familyRepo := repository.NewFamilyRepository(tx)
 		userRepo := repository.NewUserRepository(tx)
 		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
-		f, err = service.NewCreateFamily(tx, &createFamily, familyRepo, userRepo, *memberFamilyRepo).Execute(authUser)
+		f, err = service.NewCreateFamily(tx, &createFamily, familyRepo, userRepo, memberFamilyRepo).Execute(authUser)
 		return
 	})
 

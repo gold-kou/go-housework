@@ -25,6 +25,10 @@ func RegisterFamilyMember(w http.ResponseWriter, r *http.Request) {
 
 	// verify jwt
 	authUser, err := middleware.VerifyToken(bearerToken)
+	if err != nil {
+		common.ResponseUnauthorized(w, err.Error())
+		return
+	}
 
 	// get request parameter
 	var registerFamilyMember schemamodel.RequestRegisterFamilyMember

@@ -24,6 +24,10 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	// verify jwt
 	authUser, err := middleware.VerifyToken(bearerToken)
+	if err != nil {
+		common.ResponseUnauthorized(w, err.Error())
+		return
+	}
 
 	if err == nil {
 		// service layer

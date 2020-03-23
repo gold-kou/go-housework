@@ -31,10 +31,11 @@ create table "tasks"
 (
     id          serial constraint pk_tasks primary key,
     name        varchar(255) not null,
-    member_id   integer constraint fk_families_members_to_users references users(id),
+    member_id   integer constraint fk_tasks_to_users references users(id),
+    family_id   integer constraint fk_tasks_to_families references families(id),
     status      varchar(255) not null,
     date        varchar(255) not null,
     created_at  timestamp with time zone not null default current_timestamp,
     updated_at  timestamp with time zone not null default current_timestamp,
-    constraint  uk_tasks unique(name, date)
+    constraint  uk_tasks unique(name, family_id, date)
 );

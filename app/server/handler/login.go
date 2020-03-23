@@ -10,26 +10,27 @@ import (
 	"github.com/gold-kou/go-housework/app/server/service"
 	"github.com/jinzhu/gorm"
 
+	validation "github.com/go-ozzo/ozzo-validation"
 	log "github.com/sirupsen/logrus"
 )
 
 // Login - ログインAPI
 func Login(w http.ResponseWriter, r *http.Request) {
-	// クエリパラメータの取得
+	// get query parameters
 	userName := r.URL.Query().Get("user_name")
 	password := r.URL.Query().Get("password")
 
-	// バリデーションチェック
-	if userName == "" {
-		common.ResponseBadRequest(w, "user_name parameter is required")
+	// validation
+	if err := validation.Validate(userName, validation.Required); err != nil {
+		common.ResponseBadRequest(w, err.Error())
 		return
 	}
-	if password == "" {
-		common.ResponseBadRequest(w, "password parameter is required")
+	if err := validation.Validate(password, validation.Required); err != nil {
+		common.ResponseBadRequest(w, err.Error())
 		return
 	}
 
-	// service層へ処理を移譲
+	// service layer
 	var tokenString string
 	err := common.Transact(func(tx *gorm.DB) (err error) {
 		userRepo := repository.NewUserRepository(tx)
@@ -37,7 +38,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	})
 
-	// エラーハンドリング
+	// error handling
 	switch err := err.(type) {
 	case nil:
 	case *common.BadRequestError:
