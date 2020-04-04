@@ -1,6 +1,8 @@
 package service
 
 import (
+	"testing"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/golang/mock/gomock"
 	"github.com/gold-kou/go-housework/app/common"
@@ -8,7 +10,6 @@ import (
 	"github.com/gold-kou/go-housework/app/server/repository"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestDeleteUser_Execute(t *testing.T) {
@@ -45,7 +46,7 @@ func TestDeleteUser_Execute(t *testing.T) {
 				tt.mockUserRepoFunc(userRepo)
 
 				// run target method
-				err := NewDeleteUser(db, userRepo).Execute(tt.args.auth)
+				err := NewDeleteUser(userRepo).Execute(tt.args.auth)
 
 				// assert
 				assert := assert.New(t)

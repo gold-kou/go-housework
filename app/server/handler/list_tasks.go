@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gold-kou/go-housework/app/common"
-	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
 	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
@@ -16,13 +15,40 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// ListTasks handler
+// ListTasks handler top
 func ListTasks(w http.ResponseWriter, r *http.Request) {
+	common.Transact(func(tx *gorm.DB) error {
+		userRepo := repository.NewUserRepository(tx)
+		familyRepo := repository.NewFamilyRepository(tx)
+		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
+		taskRepo := repository.NewTaskRepository(tx)
+		h := ListTasksHandler{srv: service.NewListTasks(userRepo, familyRepo, memberFamilyRepo, taskRepo)}
+		resp, status, err := h.ListTasks(w, r)
+		if err != nil {
+			log.Error(err)
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(status)
+		if encodeErr := json.NewEncoder(w).Encode(resp); encodeErr != nil {
+			log.Error(encodeErr)
+			panic(encodeErr.Error())
+		}
+		return err
+	})
+}
+
+// ListTasksHandler struct
+type ListTasksHandler struct {
+	srv service.ListTasksServiceInterface
+}
+
+// ListTasks handler
+func (h ListTasksHandler) ListTasks(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// verify header token
 	authUser, err := middleware.VerifyHeaderToken(r)
 	if err != nil {
-		common.ResponseUnauthorized(w, err.Error())
-		return
+		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	}
 
 	// get query parameter
@@ -30,54 +56,27 @@ func ListTasks(w http.ResponseWriter, r *http.Request) {
 
 	// validation
 	if err := validation.Validate(targetDate, validation.Required, validation.Date("2006-01-02")); err != nil {
-		common.ResponseBadRequest(w, err.Error())
-		return
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	}
 
 	// service layer
-	var dbTasks []*db.Task
-	var dbFamily *db.Family
-	var dbUsers []*db.User
-	err = common.Transact(func(tx *gorm.DB) (err error) {
-		taskRepo := repository.NewTaskRepository(tx)
-		userRepo := repository.NewUserRepository(tx)
-		familyRepo := repository.NewFamilyRepository(tx)
-		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
-		dbTasks, dbFamily, dbUsers, err = service.NewListTasks(tx, targetDate, taskRepo, userRepo, familyRepo, memberFamilyRepo).Execute(authUser)
-		return
-	})
+	dbTasks, dbFamily, dbUsers, err := h.srv.Execute(authUser, targetDate)
 
 	// error handling
 	switch err := err.(type) {
 	case nil:
 	case *common.BadRequestError:
-		log.Warn(err)
-		common.ResponseBadRequest(w, err.Message)
-		return
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	case *common.AuthorizationError:
-		log.Warn(err)
-		common.ResponseUnauthorized(w, err.Message)
-		return
+		return common.NewAuthorizationError(err.Error()), http.StatusNonAuthoritativeInfo, err
 	default:
-		log.Error(err)
-		common.ResponseInternalServerError(w, err.Error())
-		return
+		return common.NewInternalServerError(err.Error()), http.StatusInternalServerError, err
 	}
 
-	// TODO RDBテーブル変更した影響で、dbTaskにfamily情報も入っているから、create/updateでfamilyをserviceで返す必要がなくなった。その対応。
-	// http response
 	var tasks []schemamodel.Task
 	for i, t := range dbTasks {
 		tasks = append(tasks, schemamodel.Task{TaskId: int64(t.ID), TaskName: t.Name,
 			MemberName: dbUsers[i].Name, Status: t.Status, Date: t.Date})
 	}
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(&schemamodel.ResponseListTasks{
-		Family: schemamodel.Family{FamilyId: int64(dbFamily.ID), FamilyName: dbFamily.Name},
-		Tasks:  tasks,
-	}); err != nil {
-		log.Error(err)
-		panic(err)
-	}
+	return &schemamodel.ResponseListTasks{Family: schemamodel.Family{FamilyId: int64(dbFamily.ID), FamilyName: dbFamily.Name}, Tasks: tasks}, http.StatusOK, nil
 }

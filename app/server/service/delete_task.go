@@ -4,34 +4,29 @@ import (
 	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
-	"github.com/jinzhu/gorm"
 )
 
 // DeleteTaskServiceInterface is a service interface of deleteTask
 type DeleteTaskServiceInterface interface {
-	Execute() error
+	Execute(*middleware.Auth, uint64) error
 }
 
 // DeleteTask struct
 type DeleteTask struct {
-	tx       *gorm.DB
-	taskID   uint64
-	taskRepo repository.TaskRepositoryInterface
 	userRepo repository.UserRepositoryInterface
+	taskRepo repository.TaskRepositoryInterface
 }
 
 // NewDeleteTask constructor
-func NewDeleteTask(tx *gorm.DB, taskID uint64, taskRepo repository.TaskRepositoryInterface, userRepo repository.UserRepositoryInterface) *DeleteTask {
+func NewDeleteTask(userRepo repository.UserRepositoryInterface, taskRepo repository.TaskRepositoryInterface) *DeleteTask {
 	return &DeleteTask{
-		tx:       tx,
-		taskID:   taskID,
-		taskRepo: taskRepo,
 		userRepo: userRepo,
+		taskRepo: taskRepo,
 	}
 }
 
 // Execute service main process
-func (t *DeleteTask) Execute(auth *middleware.Auth) error {
+func (t *DeleteTask) Execute(auth *middleware.Auth, taskID uint64) error {
 	// get user id from token
 	user, err := t.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {
@@ -39,7 +34,7 @@ func (t *DeleteTask) Execute(auth *middleware.Auth) error {
 	}
 
 	// delete task
-	task := db.Task{ID: t.taskID, MemberID: user.ID}
+	task := db.Task{ID: taskID, MemberID: user.ID}
 	err = t.taskRepo.DeleteTaskWhereMemberID(&task)
 	if err != nil {
 		return err

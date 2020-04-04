@@ -50,7 +50,7 @@ func TestCreateUser_Execute(t *testing.T) {
 
 				// run target method
 				reqCreateUser := &schemamodel.RequestCreateUser{UserName: common.TestUserName, Email: common.TestEmail, Password: common.TestPassword}
-				_, err := NewCreateUser(db, reqCreateUser, userRepo).Execute()
+				_, err := NewCreateUser(userRepo).Execute(reqCreateUser)
 
 				// assert
 				assert := assert.New(t)

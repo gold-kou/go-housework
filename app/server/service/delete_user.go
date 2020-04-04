@@ -3,7 +3,6 @@ package service
 import (
 	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
-	"github.com/jinzhu/gorm"
 )
 
 // DeleteUserServiceInterface is a service interface of deleteUser
@@ -13,14 +12,12 @@ type DeleteUserServiceInterface interface {
 
 // DeleteUser struct
 type DeleteUser struct {
-	tx       *gorm.DB
 	userRepo repository.UserRepositoryInterface
 }
 
 // NewDeleteUser constructor
-func NewDeleteUser(tx *gorm.DB, userRepo repository.UserRepositoryInterface) *DeleteUser {
+func NewDeleteUser(userRepo repository.UserRepositoryInterface) *DeleteUser {
 	return &DeleteUser{
-		tx:       tx,
 		userRepo: userRepo,
 	}
 }

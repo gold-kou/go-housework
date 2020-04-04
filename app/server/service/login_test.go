@@ -2,6 +2,8 @@ package service
 
 import (
 	"errors"
+	"testing"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/golang/mock/gomock"
 	"github.com/gold-kou/go-housework/app/common"
@@ -9,7 +11,6 @@ import (
 	"github.com/gold-kou/go-housework/app/server/repository"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestLogin_Execute(t *testing.T) {
@@ -68,7 +69,7 @@ func TestLogin_Execute(t *testing.T) {
 				tt.mockUserRepoFunc(userRepo)
 
 				// run target method
-				_, err := NewLogin(db, tt.args.userName, tt.args.password, userRepo).Execute()
+				_, err := NewLogin(userRepo).Execute(tt.args.userName, tt.args.password)
 
 				// assert
 				assert := assert.New(t)

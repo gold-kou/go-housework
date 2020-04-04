@@ -7,7 +7,6 @@ import (
 	"github.com/gold-kou/go-housework/app/server/service"
 
 	"github.com/gold-kou/go-housework/app/common"
-	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
 	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
@@ -15,56 +14,59 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// ListFamilyMembers handler
+// ListFamilyMembers handler top
 func ListFamilyMembers(w http.ResponseWriter, r *http.Request) {
+	common.Transact(func(tx *gorm.DB) error {
+		userRepo := repository.NewUserRepository(tx)
+		familyRepo := repository.NewFamilyRepository(tx)
+		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
+		h := ListFamilyMembersHandler{srv: service.NewListFamilyMembers(userRepo, familyRepo, memberFamilyRepo)}
+		resp, status, err := h.ListFamilyMembers(w, r)
+		if err != nil {
+			log.Error(err)
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(status)
+		if encodeErr := json.NewEncoder(w).Encode(resp); encodeErr != nil {
+			log.Error(encodeErr)
+			panic(encodeErr.Error())
+		}
+		return err
+	})
+}
+
+// ListFamilyMembersHandler struct
+type ListFamilyMembersHandler struct {
+	srv service.ListFamilyMembersServiceInterface
+}
+
+// ListFamilyMembers handler
+func (h ListFamilyMembersHandler) ListFamilyMembers(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// verify header token
 	authUser, err := middleware.VerifyHeaderToken(r)
 	if err != nil {
-		common.ResponseUnauthorized(w, err.Error())
-		return
+		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	}
 
 	// service layer
-	var f *db.Family
-	var us []*db.User
-	err = common.Transact(func(tx *gorm.DB) (err error) {
-		familyRepo := repository.NewFamilyRepository(tx)
-		userRepo := repository.NewUserRepository(tx)
-		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
-		f, us, err = service.NewListFamilyMembers(tx, familyRepo, userRepo, *memberFamilyRepo).Execute(authUser)
-		return
-	})
+	f, us, err := h.srv.Execute(authUser)
 
 	// error handling
 	switch err := err.(type) {
 	case nil:
 	case *common.BadRequestError:
-		log.Warn(err)
-		common.ResponseBadRequest(w, err.Message)
-		return
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	case *common.AuthorizationError:
-		log.Warn(err)
-		common.ResponseUnauthorized(w, err.Message)
-		return
+		return common.NewAuthorizationError(err.Error()), http.StatusNonAuthoritativeInfo, err
 	default:
-		log.Error(err)
-		common.ResponseInternalServerError(w, err.Error())
-		return
+		return common.NewInternalServerError(err.Error()), http.StatusInternalServerError, err
 	}
-
-	// http response
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
 
 	var members []schemamodel.Member
 	for _, u := range us {
 		m := schemamodel.Member{MemberId: int64(u.ID), MemberName: u.Name}
 		members = append(members, m)
 	}
-	if err := json.NewEncoder(w).Encode(&schemamodel.ResponseListFamilyMembers{
-		Family:  schemamodel.Family{FamilyId: int64(f.ID), FamilyName: f.Name},
-		Members: members}); err != nil {
-		log.Error(err)
-		panic(err)
-	}
+	return &schemamodel.ResponseListFamilyMembers{Family: schemamodel.Family{FamilyId: int64(f.ID), FamilyName: f.Name}, Members: members}, http.StatusOK, nil
 }

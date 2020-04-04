@@ -4,40 +4,33 @@ import (
 	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
-	"github.com/jinzhu/gorm"
 )
 
 // ListTasksServiceInterface is a service interface of listTasks
 type ListTasksServiceInterface interface {
-	Execute(auth *middleware.Auth) ([]*db.Task, *db.Family, []*db.User, error)
+	Execute(*middleware.Auth, string) ([]*db.Task, *db.Family, []*db.User, error)
 }
 
 // ListTasks struct
 type ListTasks struct {
-	tx               *gorm.DB
-	targetDate       string
-	taskRepo         repository.TaskRepositoryInterface
 	userRepo         repository.UserRepositoryInterface
 	familyRepo       repository.FamilyRepositoryInterface
 	memberFamilyRepo repository.MemberFamilyRepositoryInterface
+	taskRepo         repository.TaskRepositoryInterface
 }
 
 // NewListTasks constructor
-func NewListTasks(tx *gorm.DB, targetDate string,
-	taskRepo repository.TaskRepositoryInterface, userRepo repository.UserRepositoryInterface,
-	familyRepo repository.FamilyRepositoryInterface, memberFamilyRepo repository.MemberFamilyRepositoryInterface) *ListTasks {
+func NewListTasks(userRepo repository.UserRepositoryInterface, familyRepo repository.FamilyRepositoryInterface, memberFamilyRepo repository.MemberFamilyRepositoryInterface, taskRepo repository.TaskRepositoryInterface) *ListTasks {
 	return &ListTasks{
-		tx:               tx,
-		targetDate:       targetDate,
-		taskRepo:         taskRepo,
 		userRepo:         userRepo,
 		familyRepo:       familyRepo,
 		memberFamilyRepo: memberFamilyRepo,
+		taskRepo:         taskRepo,
 	}
 }
 
 // Execute service main process
-func (t *ListTasks) Execute(auth *middleware.Auth) ([]*db.Task, *db.Family, []*db.User, error) {
+func (t *ListTasks) Execute(auth *middleware.Auth, targetDate string) ([]*db.Task, *db.Family, []*db.User, error) {
 	// get user id from token
 	user, err := t.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {
@@ -55,7 +48,7 @@ func (t *ListTasks) Execute(auth *middleware.Auth) ([]*db.Task, *db.Family, []*d
 	}
 
 	// select task
-	dbTasks, err := t.taskRepo.SelectTaskWhereFamilyIDDate(familyMember.FamilyID, t.targetDate)
+	dbTasks, err := t.taskRepo.SelectTaskWhereFamilyIDDate(familyMember.FamilyID, targetDate)
 	if err != nil {
 		return nil, &db.Family{}, nil, err
 	}

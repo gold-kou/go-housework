@@ -1,44 +1,36 @@
 package service
 
 import (
-	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
-	"github.com/jinzhu/gorm"
 )
 
 // DeleteFamilyMemberServiceInterface is a service interface of deleteFamilyMember
 type DeleteFamilyMemberServiceInterface interface {
-	Execute() (*db.Family, error)
+	Execute(*middleware.Auth, uint64) error
 }
 
 // DeleteFamilyMember struct
 type DeleteFamilyMember struct {
-	tx               *gorm.DB
-	memberID         uint64
-	familyRepo       repository.FamilyRepositoryInterface
 	userRepo         repository.UserRepositoryInterface
-	memberFamilyRepo repository.MemberFamilyRepository
+	familyRepo       repository.FamilyRepositoryInterface
+	memberFamilyRepo repository.MemberFamilyRepositoryInterface
 }
 
 // NewDeleteFamilyMember constructor
-func NewDeleteFamilyMember(tx *gorm.DB, memberID uint64, familyRepo repository.FamilyRepositoryInterface,
-	userRepo repository.UserRepositoryInterface, memberFamilyRepo repository.MemberFamilyRepository) *DeleteFamilyMember {
+func NewDeleteFamilyMember(userRepo repository.UserRepositoryInterface, familyRepo repository.FamilyRepositoryInterface, memberFamilyRepo repository.MemberFamilyRepositoryInterface) *DeleteFamilyMember {
 	return &DeleteFamilyMember{
-		tx:               tx,
-		memberID:         memberID,
-		familyRepo:       familyRepo,
 		userRepo:         userRepo,
+		familyRepo:       familyRepo,
 		memberFamilyRepo: memberFamilyRepo,
 	}
 }
 
 // Execute service main process
-func (mf *DeleteFamilyMember) Execute(auth *middleware.Auth) error {
+func (mf *DeleteFamilyMember) Execute(auth *middleware.Auth, memberID uint64) error {
 	// delete member_family
-	if err := mf.memberFamilyRepo.DeleteMemberFromFamily(mf.memberID); err != nil {
+	if err := mf.memberFamilyRepo.DeleteMemberFromFamily(memberID); err != nil {
 		return err
 	}
-
 	return nil
 }

@@ -1,32 +1,27 @@
 package service
 
 import (
-	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
-	"github.com/jinzhu/gorm"
 )
 
 // DeleteFamilyServiceInterface is a service interface of deleteFamily
 type DeleteFamilyServiceInterface interface {
-	Execute() (*db.Family, error)
+	Execute(*middleware.Auth) error
 }
 
 // DeleteFamily struct
 type DeleteFamily struct {
-	tx               *gorm.DB
-	familyRepo       repository.FamilyRepositoryInterface
 	userRepo         repository.UserRepositoryInterface
-	memberFamilyRepo repository.MemberFamilyRepository
+	familyRepo       repository.FamilyRepositoryInterface
+	memberFamilyRepo repository.MemberFamilyRepositoryInterface
 }
 
 // NewDeleteFamily constructor
-func NewDeleteFamily(tx *gorm.DB, familyRepo repository.FamilyRepositoryInterface,
-	userRepo repository.UserRepositoryInterface, memberFamilyRepo repository.MemberFamilyRepository) *DeleteFamily {
+func NewDeleteFamily(userRepo repository.UserRepositoryInterface, familyRepo repository.FamilyRepositoryInterface, memberFamilyRepo repository.MemberFamilyRepositoryInterface) *DeleteFamily {
 	return &DeleteFamily{
-		tx:               tx,
-		familyRepo:       familyRepo,
 		userRepo:         userRepo,
+		familyRepo:       familyRepo,
 		memberFamilyRepo: memberFamilyRepo,
 	}
 }
