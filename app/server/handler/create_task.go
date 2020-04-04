@@ -16,76 +16,75 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// CreateTask handler
+// CreateTask handler top
 func CreateTask(w http.ResponseWriter, r *http.Request) {
+	common.Transact(func(tx *gorm.DB) error {
+		userRepo := repository.NewUserRepository(tx)
+		familyRepo := repository.NewFamilyRepository(tx)
+		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
+		taskRepo := repository.NewTaskRepository(tx)
+		h := CreateTaskHandler{srv: service.NewCreateTask(userRepo, familyRepo, memberFamilyRepo, taskRepo)}
+		resp, status, err := h.CreateTask(w, r)
+		if err != nil {
+			log.Error(err)
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(status)
+		if encodeErr := json.NewEncoder(w).Encode(resp); encodeErr != nil {
+			log.Error(encodeErr)
+			panic(encodeErr.Error())
+		}
+		return err
+	})
+}
+
+// CreateTaskHandler struct
+type CreateTaskHandler struct {
+	srv service.CreateTaskServiceInterface
+}
+
+// CreateTask handler
+func (h CreateTaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// verify header token
 	authUser, err := middleware.VerifyHeaderToken(r)
 	if err != nil {
-		common.ResponseUnauthorized(w, err.Error())
-		return
+		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	}
 
 	// get request parameter
 	var reqCreateTask schemamodel.RequestCreateTask
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Warn(err)
-		common.ResponseBadRequest(w, err.Error())
-		return
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	}
 	defer r.Body.Close()
 	if err := json.Unmarshal(b, &reqCreateTask); err != nil {
-		log.Warn(err)
-		common.ResponseBadRequest(w, err.Error())
-		return
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	}
 
 	// validation
 	if err := reqCreateTask.ValidateParam(); err != nil {
-		log.Warn(err)
-		common.ResponseBadRequest(w, err.Error())
-		return
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	}
 
 	// service layer
-	var t *db.Task
-	var f *db.Family
 	var u *db.User
-	err = common.Transact(func(tx *gorm.DB) (err error) {
-		taskRepo := repository.NewTaskRepository(tx)
-		userRepo := repository.NewUserRepository(tx)
-		familyRepo := repository.NewFamilyRepository(tx)
-		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
-		t, f, u, err = service.NewCreateTask(tx, &reqCreateTask, taskRepo, userRepo, familyRepo, memberFamilyRepo).Execute(authUser)
-		return
-	})
+	var f *db.Family
+	var t *db.Task
+	u, f, t, err = h.srv.Execute(authUser, &reqCreateTask)
 
 	// error handling
 	switch err := err.(type) {
 	case nil:
 	case *common.BadRequestError:
-		log.Warn(err)
-		common.ResponseBadRequest(w, err.Message)
-		return
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	case *common.AuthorizationError:
-		log.Warn(err)
-		common.ResponseUnauthorized(w, err.Message)
-		return
+		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	default:
-		log.Error(err)
-		common.ResponseInternalServerError(w, err.Error())
-		return
+		return common.NewInternalServerError(err.Error()), http.StatusInternalServerError, err
 	}
 
-	// http response
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(&schemamodel.ResponseCreateTask{
-		Family: schemamodel.Family{FamilyId: int64(f.ID), FamilyName: f.Name},
-		Task: schemamodel.Task{TaskId: int64(t.ID), TaskName: t.Name,
-			MemberName: u.Name, Status: t.Status, Date: t.Date},
-	}); err != nil {
-		log.Error(err)
-		panic(err)
-	}
+	return &schemamodel.ResponseCreateTask{Family: schemamodel.Family{FamilyId: int64(f.ID), FamilyName: f.Name}, Task: schemamodel.Task{TaskId: int64(t.ID), TaskName: t.Name, MemberName: u.Name, Status: t.Status, Date: t.Date}},
+		http.StatusOK, nil
 }

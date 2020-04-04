@@ -4,29 +4,25 @@ import (
 	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
-	"github.com/jinzhu/gorm"
 )
 
 // ShowFamilyServiceInterface is a service interface of showFamily
 type ShowFamilyServiceInterface interface {
-	Execute() (*db.Family, error)
+	Execute(*middleware.Auth) (*db.Family, error)
 }
 
 // ShowFamily struct
 type ShowFamily struct {
-	tx               *gorm.DB
-	familyRepo       repository.FamilyRepositoryInterface
 	userRepo         repository.UserRepositoryInterface
-	memberFamilyRepo repository.MemberFamilyRepository
+	familyRepo       repository.FamilyRepositoryInterface
+	memberFamilyRepo repository.MemberFamilyRepositoryInterface
 }
 
 // NewShowFamily constructor
-func NewShowFamily(tx *gorm.DB, familyRepo repository.FamilyRepositoryInterface,
-	userRepo repository.UserRepositoryInterface, memberFamilyRepo repository.MemberFamilyRepository) *ShowFamily {
+func NewShowFamily(userRepo repository.UserRepositoryInterface, familyRepo repository.FamilyRepositoryInterface, memberFamilyRepo repository.MemberFamilyRepositoryInterface) *ShowFamily {
 	return &ShowFamily{
-		tx:               tx,
-		familyRepo:       familyRepo,
 		userRepo:         userRepo,
+		familyRepo:       familyRepo,
 		memberFamilyRepo: memberFamilyRepo,
 	}
 }

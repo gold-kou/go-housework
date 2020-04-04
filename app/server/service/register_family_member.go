@@ -6,38 +6,31 @@ import (
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
 	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
-	"github.com/jinzhu/gorm"
 )
 
 // RegisterFamilyMemberServiceInterface is a service interface of registerFamilyMember
 type RegisterFamilyMemberServiceInterface interface {
-	Execute() (*db.Family, error)
+	Execute(*middleware.Auth, *schemamodel.RequestRegisterFamilyMember) (*db.User, *db.Family, error)
 }
 
 // RegisterFamilyMember struct
 type RegisterFamilyMember struct {
-	tx                   *gorm.DB
-	registerFamilyMember *schemamodel.RequestRegisterFamilyMember
-	familyRepo           repository.FamilyRepositoryInterface
-	userRepo             repository.UserRepositoryInterface
-	memberFamilyRepo     repository.MemberFamilyRepository
+	userRepo         repository.UserRepositoryInterface
+	familyRepo       repository.FamilyRepositoryInterface
+	memberFamilyRepo repository.MemberFamilyRepositoryInterface
 }
 
 // NewRegisterFamilyMember constructor
-func NewRegisterFamilyMember(tx *gorm.DB, registerFamilyMember *schemamodel.RequestRegisterFamilyMember,
-	familyRepo repository.FamilyRepositoryInterface, userRepo repository.UserRepositoryInterface,
-	memberFamilyRepo repository.MemberFamilyRepository) *RegisterFamilyMember {
+func NewRegisterFamilyMember(userRepo repository.UserRepositoryInterface, familyRepo repository.FamilyRepositoryInterface, memberFamilyRepo repository.MemberFamilyRepositoryInterface) *RegisterFamilyMember {
 	return &RegisterFamilyMember{
-		tx:                   tx,
-		registerFamilyMember: registerFamilyMember,
-		familyRepo:           familyRepo,
-		userRepo:             userRepo,
-		memberFamilyRepo:     memberFamilyRepo,
+		userRepo:         userRepo,
+		familyRepo:       familyRepo,
+		memberFamilyRepo: memberFamilyRepo,
 	}
 }
 
 // Execute service main process
-func (fm *RegisterFamilyMember) Execute(auth *middleware.Auth) (*db.User, *db.Family, error) {
+func (fm *RegisterFamilyMember) Execute(auth *middleware.Auth, registerFamilyMember *schemamodel.RequestRegisterFamilyMember) (*db.User, *db.Family, error) {
 	// get user_id from auth
 	user, err := fm.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {
@@ -59,7 +52,7 @@ func (fm *RegisterFamilyMember) Execute(auth *middleware.Auth) (*db.User, *db.Fa
 	}
 
 	// get user_id from request param
-	targetUser, err := fm.userRepo.GetUserWhereUsername(fm.registerFamilyMember.MemberName)
+	targetUser, err := fm.userRepo.GetUserWhereUsername(registerFamilyMember.MemberName)
 	if err != nil {
 		return &db.User{}, &db.Family{}, err
 	}

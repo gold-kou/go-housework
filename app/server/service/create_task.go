@@ -5,66 +5,60 @@ import (
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
 	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
-	"github.com/jinzhu/gorm"
 )
 
 // CreateTaskServiceInterface is a service interface of createTask
 type CreateTaskServiceInterface interface {
-	Execute(auth *middleware.Auth) (*db.Task, *db.Family, *db.User, error)
+	Execute(*middleware.Auth, *schemamodel.RequestCreateTask) (*db.User, *db.Family, *db.Task, error)
 }
 
 // CreateTask struct
 type CreateTask struct {
-	tx               *gorm.DB
-	reqCreateTask    *schemamodel.RequestCreateTask
-	taskRepo         repository.TaskRepositoryInterface
 	userRepo         repository.UserRepositoryInterface
 	familyRepo       repository.FamilyRepositoryInterface
 	memberFamilyRepo repository.MemberFamilyRepositoryInterface
+	taskRepo         repository.TaskRepositoryInterface
 }
 
 // NewCreateTask constructor
-func NewCreateTask(tx *gorm.DB, reqCreateTask *schemamodel.RequestCreateTask,
-	taskRepo repository.TaskRepositoryInterface, userRepo repository.UserRepositoryInterface,
-	familyRepo repository.FamilyRepositoryInterface, memberFamilyRepo repository.MemberFamilyRepositoryInterface) *CreateTask {
+func NewCreateTask(userRepo repository.UserRepositoryInterface, familyRepo repository.FamilyRepositoryInterface,
+	memberFamilyRepo repository.MemberFamilyRepositoryInterface, taskRepo repository.TaskRepositoryInterface) *CreateTask {
 	return &CreateTask{
-		tx:               tx,
-		reqCreateTask:    reqCreateTask,
-		taskRepo:         taskRepo,
 		userRepo:         userRepo,
 		familyRepo:       familyRepo,
 		memberFamilyRepo: memberFamilyRepo,
+		taskRepo:         taskRepo,
 	}
 }
 
 // Execute service main process
-func (t *CreateTask) Execute(auth *middleware.Auth) (*db.Task, *db.Family, *db.User, error) {
+func (t *CreateTask) Execute(auth *middleware.Auth, reqCreateTask *schemamodel.RequestCreateTask) (*db.User, *db.Family, *db.Task, error) {
 	// get user id from token
 	user, err := t.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {
-		return &db.Task{}, &db.Family{}, &db.User{}, err
+		return &db.User{}, &db.Family{}, &db.Task{}, err
 	}
 
 	// get family
 	familyMember, err := t.memberFamilyRepo.GetMemberFamilyWhereMemberID(user.ID)
 	if err != nil {
-		return &db.Task{}, &db.Family{}, &db.User{}, err
+		return &db.User{}, &db.Family{}, &db.Task{}, err
 	}
 	family, err := t.familyRepo.ShowFamily(familyMember.FamilyID)
 	if err != nil {
-		return &db.Task{}, &db.Family{}, &db.User{}, err
+		return &db.User{}, &db.Family{}, &db.Task{}, err
 	}
 
 	// get user id from request parmeter
-	reqUser, err := t.userRepo.GetUserWhereUsername(t.reqCreateTask.MemberName)
+	reqUser, err := t.userRepo.GetUserWhereUsername(reqCreateTask.MemberName)
 	if err != nil {
-		return &db.Task{}, &db.Family{}, &db.User{}, err
+		return &db.User{}, &db.Family{}, &db.Task{}, err
 	}
 
 	// insert task
-	dbTask := &db.Task{Name: t.reqCreateTask.TaskName, MemberID: reqUser.ID, FamilyID: family.ID, Status: t.reqCreateTask.Status, Date: t.reqCreateTask.Date}
+	dbTask := &db.Task{Name: reqCreateTask.TaskName, MemberID: reqUser.ID, FamilyID: family.ID, Status: reqCreateTask.Status, Date: reqCreateTask.Date}
 	if err := t.taskRepo.InsertTask(dbTask); err != nil {
-		return &db.Task{}, &db.Family{}, &db.User{}, err
+		return &db.User{}, &db.Family{}, &db.Task{}, err
 	}
-	return dbTask, family, reqUser, nil
+	return reqUser, family, dbTask, nil
 }

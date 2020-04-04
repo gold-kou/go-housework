@@ -4,29 +4,25 @@ import (
 	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
-	"github.com/jinzhu/gorm"
 )
 
 // ListFamilyMembersServiceInterface is a service interface of listFamilyMembers
 type ListFamilyMembersServiceInterface interface {
-	Execute() (*db.Family, []*db.User, error)
+	Execute(*middleware.Auth) (*db.Family, []*db.User, error)
 }
 
 // ListFamilyMembers struct
 type ListFamilyMembers struct {
-	tx               *gorm.DB
-	familyRepo       repository.FamilyRepositoryInterface
 	userRepo         repository.UserRepositoryInterface
-	memberFamilyRepo repository.MemberFamilyRepository
+	familyRepo       repository.FamilyRepositoryInterface
+	memberFamilyRepo repository.MemberFamilyRepositoryInterface
 }
 
 // NewListFamilyMembers constructor
-func NewListFamilyMembers(tx *gorm.DB, familyRepo repository.FamilyRepositoryInterface,
-	userRepo repository.UserRepositoryInterface, memberFamilyRepo repository.MemberFamilyRepository) *ListFamilyMembers {
+func NewListFamilyMembers(userRepo repository.UserRepositoryInterface, familyRepo repository.FamilyRepositoryInterface, memberFamilyRepo repository.MemberFamilyRepositoryInterface) *ListFamilyMembers {
 	return &ListFamilyMembers{
-		tx:               tx,
-		familyRepo:       familyRepo,
 		userRepo:         userRepo,
+		familyRepo:       familyRepo,
 		memberFamilyRepo: memberFamilyRepo,
 	}
 }

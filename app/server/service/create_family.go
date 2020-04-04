@@ -6,38 +6,31 @@ import (
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
 	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
-	"github.com/jinzhu/gorm"
 )
 
 // CreateFamilyServiceInterface is a service interface of createFamily
 type CreateFamilyServiceInterface interface {
-	Execute() (*db.Family, error)
+	Execute(*middleware.Auth, *schemamodel.RequestCreateFamily) (*db.Family, error)
 }
 
 // CreateFamily struct
 type CreateFamily struct {
-	tx               *gorm.DB
-	createFamily     *schemamodel.RequestCreateFamily
-	familyRepo       repository.FamilyRepositoryInterface
 	userRepo         repository.UserRepositoryInterface
+	familyRepo       repository.FamilyRepositoryInterface
 	memberFamilyRepo repository.MemberFamilyRepositoryInterface
 }
 
 // NewCreateFamily constructor
-func NewCreateFamily(tx *gorm.DB, createFamily *schemamodel.RequestCreateFamily,
-	familyRepo repository.FamilyRepositoryInterface, userRepo repository.UserRepositoryInterface,
-	memberFamilyRepo repository.MemberFamilyRepositoryInterface) *CreateFamily {
+func NewCreateFamily(userRepo repository.UserRepositoryInterface, familyRepo repository.FamilyRepositoryInterface, memberFamilyRepo repository.MemberFamilyRepositoryInterface) *CreateFamily {
 	return &CreateFamily{
-		tx:               tx,
-		createFamily:     createFamily,
-		familyRepo:       familyRepo,
 		userRepo:         userRepo,
+		familyRepo:       familyRepo,
 		memberFamilyRepo: memberFamilyRepo,
 	}
 }
 
 // Execute service main process
-func (f *CreateFamily) Execute(auth *middleware.Auth) (*db.Family, error) {
+func (f *CreateFamily) Execute(auth *middleware.Auth, createFamily *schemamodel.RequestCreateFamily) (*db.Family, error) {
 	// get user id
 	user, err := f.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {
@@ -51,7 +44,7 @@ func (f *CreateFamily) Execute(auth *middleware.Auth) (*db.Family, error) {
 	}
 
 	// data
-	dbFamily := &db.Family{Name: f.createFamily.FamilyName}
+	dbFamily := &db.Family{Name: createFamily.FamilyName}
 
 	// insert family
 	if err := f.familyRepo.InsertFamily(dbFamily); err != nil {

@@ -14,52 +14,58 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Login - ログインAPI
+// Login handler top
 func Login(w http.ResponseWriter, r *http.Request) {
+	common.Transact(func(tx *gorm.DB) error {
+		userRepo := repository.NewUserRepository(tx)
+		h := LoginHandler{srv: service.NewLogin(userRepo)}
+		resp, status, err := h.Login(w, r)
+		if err != nil {
+			log.Error(err)
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(status)
+		if encodeErr := json.NewEncoder(w).Encode(resp); encodeErr != nil {
+			log.Error(encodeErr)
+			panic(encodeErr.Error())
+		}
+		return err
+	})
+}
+
+// LoginHandler struct
+type LoginHandler struct {
+	srv service.LoginServiceInterface
+}
+
+// Login - ログインAPI
+func (h LoginHandler) Login(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// get query parameters
 	userName := r.URL.Query().Get("user_name")
 	password := r.URL.Query().Get("password")
 
 	// validation
 	if err := validation.Validate(userName, validation.Required); err != nil {
-		common.ResponseBadRequest(w, err.Error())
-		return
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	}
 	if err := validation.Validate(password, validation.Required); err != nil {
-		common.ResponseBadRequest(w, err.Error())
-		return
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	}
 
 	// service layer
-	var tokenString string
-	err := common.Transact(func(tx *gorm.DB) (err error) {
-		userRepo := repository.NewUserRepository(tx)
-		tokenString, err = service.NewLogin(tx, userName, password, userRepo).Execute()
-		return
-	})
+	tokenString, err := h.srv.Execute(userName, password)
 
 	// error handling
 	switch err := err.(type) {
 	case nil:
 	case *common.BadRequestError:
-		log.Warn(err)
-		common.ResponseBadRequest(w, err.Message)
-		return
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	case *common.AuthorizationError:
-		log.Warn(err)
-		common.ResponseUnauthorized(w, err.Message)
-		return
+		return common.NewAuthorizationError(err.Error()), http.StatusNonAuthoritativeInfo, err
 	default:
-		log.Error(err)
-		common.ResponseInternalServerError(w, err.Error())
-		return
+		return common.NewInternalServerError(err.Error()), http.StatusInternalServerError, err
 	}
 
-	// HTTPレスポンス作成
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(&schemamodel.ResponseLogin{Token: tokenString}); err != nil {
-		log.Error(err)
-		panic(err)
-	}
+	return &schemamodel.ResponseLogin{Token: tokenString}, http.StatusOK, nil
 }

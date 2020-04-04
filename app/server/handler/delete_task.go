@@ -16,58 +16,65 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// DeleteTask handler
+// DeleteTask handler top
 func DeleteTask(w http.ResponseWriter, r *http.Request) {
+	common.Transact(func(tx *gorm.DB) error {
+		userRepo := repository.NewUserRepository(tx)
+		taskRepo := repository.NewTaskRepository(tx)
+		h := DeleteTaskHandler{srv: service.NewDeleteTask(userRepo, taskRepo)}
+		resp, status, err := h.DeleteTask(w, r)
+		if err != nil {
+			log.Error(err)
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(status)
+		if encodeErr := json.NewEncoder(w).Encode(resp); encodeErr != nil {
+			log.Error(encodeErr)
+			panic(encodeErr.Error())
+		}
+		return err
+	})
+}
+
+// DeleteTaskHandler struct
+type DeleteTaskHandler struct {
+	srv service.DeleteTaskServiceInterface
+}
+
+// DeleteTask handler
+func (h DeleteTaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// verify header token
 	authUser, err := middleware.VerifyHeaderToken(r)
 	if err != nil {
-		common.ResponseUnauthorized(w, err.Error())
-		return
+		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	}
 
 	// get path parameter
 	vars := mux.Vars(r)
 	taskIDStr, ok := vars["task_id"]
 	if !ok {
-		common.ResponseBadRequest(w, "Missing required parameter: task_id")
-		return
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	}
 	taskID, err := strconv.Atoi(taskIDStr)
 	if err != nil {
-		common.ResponseInternalServerError(w, err.Error())
+		return common.NewInternalServerError(err.Error()), http.StatusInternalServerError, err
 	}
 
 	// service layer
-	err = common.Transact(func(tx *gorm.DB) (err error) {
-		taskRepo := repository.NewTaskRepository(tx)
-		userRepo := repository.NewUserRepository(tx)
-		err = service.NewDeleteTask(tx, uint64(taskID), taskRepo, userRepo).Execute(authUser)
-		return
-	})
+	err = h.srv.Execute(authUser, uint64(taskID))
 
 	// error handling
 	switch err := err.(type) {
 	case nil:
 	case *common.BadRequestError:
-		log.Warn(err)
-		common.ResponseBadRequest(w, err.Message)
-		return
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	case *common.AuthorizationError:
-		log.Warn(err)
-		common.ResponseUnauthorized(w, err.Message)
-		return
+		return common.NewAuthorizationError(err.Error()), http.StatusNonAuthoritativeInfo, err
 	default:
-		log.Error(err)
-		common.ResponseInternalServerError(w, err.Error())
-		return
+		return common.NewInternalServerError(err.Error()), http.StatusInternalServerError, err
 	}
 
-	// http response
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(&schemamodel.ResponseDeleteTask{
-		Message: "the task is deleted"}); err != nil {
-		log.Error(err)
-		panic(err)
-	}
+	return &schemamodel.ResponseDeleteTask{Message: "the task is deleted"}, http.StatusOK, nil
+
 }

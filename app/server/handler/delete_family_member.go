@@ -15,59 +15,65 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// DeleteFamilyMember handler
+// DeleteFamilyMember handler top
 func DeleteFamilyMember(w http.ResponseWriter, r *http.Request) {
+	common.Transact(func(tx *gorm.DB) error {
+		userRepo := repository.NewUserRepository(tx)
+		familyRepo := repository.NewFamilyRepository(tx)
+		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
+		h := DeleteFamilyMemberHandler{srv: service.NewDeleteFamilyMember(userRepo, familyRepo, memberFamilyRepo)}
+		resp, status, err := h.DeleteFamilyMember(w, r)
+		if err != nil {
+			log.Error(err)
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(status)
+		if encodeErr := json.NewEncoder(w).Encode(resp); encodeErr != nil {
+			log.Error(encodeErr)
+			panic(encodeErr.Error())
+		}
+		return err
+	})
+}
+
+// DeleteFamilyMemberHandler struct
+type DeleteFamilyMemberHandler struct {
+	srv service.DeleteFamilyMemberServiceInterface
+}
+
+// DeleteFamilyMember handler
+func (h DeleteFamilyMemberHandler) DeleteFamilyMember(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// verify header token
 	authUser, err := middleware.VerifyHeaderToken(r)
 	if err != nil {
-		common.ResponseUnauthorized(w, err.Error())
-		return
+		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	}
 
-	// PathParameter
+	// get PathParameter
 	vars := mux.Vars(r)
 	memberIDStr, ok := vars["member_id"]
 	if !ok {
-		common.ResponseBadRequest(w, "Missing required parameter: member_id")
-		return
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	}
 	memberID, err := strconv.Atoi(memberIDStr)
 	if err != nil {
-		common.ResponseInternalServerError(w, err.Error())
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	}
 
 	// service layer
-	err = common.Transact(func(tx *gorm.DB) (err error) {
-		familyRepo := repository.NewFamilyRepository(tx)
-		userRepo := repository.NewUserRepository(tx)
-		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
-		err = service.NewDeleteFamilyMember(tx, uint64(memberID), familyRepo, userRepo, *memberFamilyRepo).Execute(authUser)
-		return
-	})
+	err = h.srv.Execute(authUser, uint64(memberID))
 
 	// error handling
 	switch err := err.(type) {
 	case nil:
 	case *common.BadRequestError:
-		log.Warn(err)
-		common.ResponseBadRequest(w, err.Message)
-		return
+		return common.NewBadRequestError(err.Error()), http.StatusBadRequest, err
 	case *common.AuthorizationError:
-		log.Warn(err)
-		common.ResponseUnauthorized(w, err.Message)
-		return
+		return common.NewAuthorizationError(err.Error()), http.StatusBadRequest, err
 	default:
-		log.Error(err)
-		common.ResponseInternalServerError(w, err.Error())
-		return
+		return common.NewInternalServerError(err.Error()), http.StatusBadRequest, err
 	}
 
-	// http response
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(&schemamodel.ResponseDeleteFamilyMember{
-		Message: "deleted the member from the family"}); err != nil {
-		log.Error(err)
-		panic(err)
-	}
+	return &schemamodel.ResponseDeleteFamilyMember{Message: "deleted the member from the family"}, http.StatusOK, nil
 }
