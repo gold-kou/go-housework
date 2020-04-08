@@ -7,6 +7,7 @@ package service
 import (
 	gomock "github.com/golang/mock/gomock"
 	db "github.com/gold-kou/go-housework/app/model/db"
+	schemamodel "github.com/gold-kou/go-housework/app/model/schemamodel"
 	reflect "reflect"
 )
 
@@ -34,16 +35,16 @@ func (m *MockCreateUserServiceInterface) EXPECT() *MockCreateUserServiceInterfac
 }
 
 // Execute mocks base method
-func (m *MockCreateUserServiceInterface) Execute() (*db.User, error) {
+func (m *MockCreateUserServiceInterface) Execute(createUser *schemamodel.RequestCreateUser) (*db.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Execute")
+	ret := m.ctrl.Call(m, "Execute", createUser)
 	ret0, _ := ret[0].(*db.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Execute indicates an expected call of Execute
-func (mr *MockCreateUserServiceInterfaceMockRecorder) Execute() *gomock.Call {
+func (mr *MockCreateUserServiceInterfaceMockRecorder) Execute(createUser interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockCreateUserServiceInterface)(nil).Execute))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockCreateUserServiceInterface)(nil).Execute), createUser)
 }

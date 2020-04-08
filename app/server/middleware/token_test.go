@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/gold-kou/go-housework/app/model"
 	"strings"
 	"testing"
 
@@ -39,7 +40,7 @@ func TestGenerateToken(t *testing.T) {
 			defer tmp()
 
 			// test target
-			got, err := GenerateToken(tt.args.userName)
+			got, err := NewTokenStruct().GenerateToken(tt.args.userName)
 			sharedTestToken = got
 
 			if tt.wantErr {
@@ -61,7 +62,7 @@ func Test_verifyToken(t *testing.T) {
 		name        string
 		args        args
 		environment string
-		want        *Auth
+		want        *model.Auth
 		wantErr     bool
 		watnErrMsg  string
 	}{
@@ -69,7 +70,7 @@ func Test_verifyToken(t *testing.T) {
 			name:        "success",
 			args:        args{tokenString: sharedTestToken},
 			environment: common.TestSecretKey,
-			want:        &Auth{UserName: common.TestUserName},
+			want:        &model.Auth{UserName: common.TestUserName},
 			wantErr:     false,
 		},
 		{

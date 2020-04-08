@@ -1,15 +1,15 @@
 package service
 
 import (
+	"github.com/gold-kou/go-housework/app/model"
 	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
-	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
 )
 
 // UpdateFamilyServiceInterface is a service interface of updateFamily
 type UpdateFamilyServiceInterface interface {
-	Execute(*middleware.Auth, *schemamodel.RequestUpdateFamily) (*db.Family, error)
+	Execute(*model.Auth, *schemamodel.RequestUpdateFamily) (*db.Family, error)
 }
 
 // UpdateFamily struct
@@ -29,7 +29,7 @@ func NewUpdateFamily(userRepo repository.UserRepositoryInterface, familyRepo rep
 }
 
 // Execute service main process
-func (f *UpdateFamily) Execute(auth *middleware.Auth, updateFamily *schemamodel.RequestUpdateFamily) (*db.Family, error) {
+func (f *UpdateFamily) Execute(auth *model.Auth, updateFamily *schemamodel.RequestUpdateFamily) (*db.Family, error) {
 	// get user id
 	user, err := f.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {

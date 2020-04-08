@@ -10,8 +10,8 @@ import (
 
 // TaskRepositoryInterface is a repository interface of task
 type TaskRepositoryInterface interface {
-	SelectTaskWhereFamilyIDDate(uint64, string) ([]*db.Task, error)
 	InsertTask(*db.Task) error
+	SelectTaskWhereFamilyIDDate(uint64, string) ([]*db.Task, error)
 	UpdateTask(*db.Task) error
 	DeleteTaskWhereMemberID(*db.Task) error
 }
@@ -28,6 +28,14 @@ func NewTaskRepository(db *gorm.DB) *TaskRepository {
 	}
 }
 
+// InsertTask insert task
+func (r TaskRepository) InsertTask(task *db.Task) error {
+	if err := r.db.Create(task).Error; err != nil {
+		return common.NewInternalServerError(err.Error())
+	}
+	return nil
+}
+
 // SelectTaskWhereFamilyIDDate select task where family_id & date
 func (r TaskRepository) SelectTaskWhereFamilyIDDate(familyID uint64, targetDate string) ([]*db.Task, error) {
 	var dbTasks []*db.Task
@@ -35,14 +43,6 @@ func (r TaskRepository) SelectTaskWhereFamilyIDDate(familyID uint64, targetDate 
 		return dbTasks, common.NewInternalServerError(err.Error())
 	}
 	return dbTasks, nil
-}
-
-// InsertTask insert task
-func (r TaskRepository) InsertTask(task *db.Task) error {
-	if err := r.db.Create(task).Error; err != nil {
-		return common.NewInternalServerError(err.Error())
-	}
-	return nil
 }
 
 // UpdateTask update task

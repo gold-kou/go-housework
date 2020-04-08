@@ -1,15 +1,15 @@
 package service
 
 import (
+	"github.com/gold-kou/go-housework/app/model"
 	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
-	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
 )
 
 // CreateTaskServiceInterface is a service interface of createTask
 type CreateTaskServiceInterface interface {
-	Execute(*middleware.Auth, *schemamodel.RequestCreateTask) (*db.User, *db.Family, *db.Task, error)
+	Execute(*model.Auth, *schemamodel.RequestCreateTask) (*db.User, *db.Family, *db.Task, error)
 }
 
 // CreateTask struct
@@ -32,7 +32,7 @@ func NewCreateTask(userRepo repository.UserRepositoryInterface, familyRepo repos
 }
 
 // Execute service main process
-func (t *CreateTask) Execute(auth *middleware.Auth, reqCreateTask *schemamodel.RequestCreateTask) (*db.User, *db.Family, *db.Task, error) {
+func (t *CreateTask) Execute(auth *model.Auth, reqCreateTask *schemamodel.RequestCreateTask) (*db.User, *db.Family, *db.Task, error) {
 	// get user id from token
 	user, err := t.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {

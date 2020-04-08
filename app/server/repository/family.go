@@ -55,7 +55,7 @@ func (f *FamilyRepository) DeleteFamily(familyID uint64) error {
 func (f *FamilyRepository) ShowFamily(familyID uint64) (*db.Family, error) {
 	var family db.Family
 	if err := f.db.Where("id = ?", familyID).Find(&family).Error; err != nil {
-		return &family, common.NewInternalServerError(err.Error())
+		return &db.Family{}, common.NewInternalServerError(err.Error())
 	}
 	return &family, nil
 }

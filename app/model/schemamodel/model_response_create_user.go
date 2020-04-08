@@ -13,7 +13,4 @@ package schemamodel
 type ResponseCreateUser struct {
 
 	User User `json:"user"`
-
-	// HTTPレスポンスメッセージ
-	Message string `json:"message"`
 }

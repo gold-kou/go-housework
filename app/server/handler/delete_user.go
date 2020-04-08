@@ -18,7 +18,7 @@ import (
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	common.Transact(func(tx *gorm.DB) error {
 		userRepo := repository.NewUserRepository(tx)
-		h := DeleteUserHandler{srv: service.NewDeleteUser(userRepo)}
+		h := DeleteUserHandler{tok: middleware.NewTokenStruct(), srv: service.NewDeleteUser(userRepo)}
 		resp, status, err := h.DeleteUser(w, r)
 		if err != nil {
 			log.Error(err)
@@ -36,13 +36,14 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 // DeleteUserHandler struct
 type DeleteUserHandler struct {
+	tok middleware.TokenInterface
 	srv service.DeleteUserServiceInterface
 }
 
 // DeleteUser - delete user API
 func (h DeleteUserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// verify header token
-	authUser, err := middleware.VerifyHeaderToken(r)
+	authUser, err := h.tok.VerifyHeaderToken(r)
 	if err != nil {
 		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	}
@@ -61,5 +62,5 @@ func (h DeleteUserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) (r
 		return common.NewInternalServerError(err.Error()), http.StatusInternalServerError, err
 	}
 
-	return &schemamodel.ResponseDeleteUser{Message: "the user deleted"}, http.StatusOK, nil
+	return &schemamodel.ResponseDeleteUser{Message: "delete complete"}, http.StatusOK, nil
 }

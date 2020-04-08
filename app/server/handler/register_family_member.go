@@ -20,7 +20,7 @@ func RegisterFamilyMember(w http.ResponseWriter, r *http.Request) {
 		userRepo := repository.NewUserRepository(tx)
 		familyRepo := repository.NewFamilyRepository(tx)
 		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
-		h := RegisterFamilyMemberHandler{srv: service.NewRegisterFamilyMember(userRepo, familyRepo, memberFamilyRepo)}
+		h := RegisterFamilyMemberHandler{tok: middleware.NewTokenStruct(), srv: service.NewRegisterFamilyMember(userRepo, familyRepo, memberFamilyRepo)}
 		resp, status, err := h.RegisterFamilyMember(w, r)
 		if err != nil {
 			log.Error(err)
@@ -38,13 +38,14 @@ func RegisterFamilyMember(w http.ResponseWriter, r *http.Request) {
 
 // RegisterFamilyMemberHandler struct
 type RegisterFamilyMemberHandler struct {
+	tok middleware.TokenInterface
 	srv service.RegisterFamilyMemberServiceInterface
 }
 
 // RegisterFamilyMember handler
 func (h RegisterFamilyMemberHandler) RegisterFamilyMember(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// verify header token
-	authUser, err := middleware.VerifyHeaderToken(r)
+	authUser, err := h.tok.VerifyHeaderToken(r)
 	if err != nil {
 		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	}

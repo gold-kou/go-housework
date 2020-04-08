@@ -14,7 +14,7 @@ import (
 
 func TestCreateUser_Execute(t *testing.T) {
 	type args struct {
-		//user *db.User
+		createUser *schemamodel.RequestCreateUser
 	}
 	tests := []struct {
 		name             string
@@ -24,18 +24,15 @@ func TestCreateUser_Execute(t *testing.T) {
 		wantErrMsg       string
 	}{
 		/*
-			// TODO because of bcrypt randam
-			{
-				name: "success",
-				mockUserRepoFunc: func(r *repository.MockUserRepositoryInterface) {
-					r.EXPECT().
-						InsertUser(&db.User{}).
-						Return(nil)
+			skip for bcrypt random
+				{
+					name: "success",
+					mockUserRepoFunc: func(r *repository.MockUserRepositoryInterface) {
+						r.EXPECT().InsertUser(&db.User{Name: common.TestUserName, Email: common.TestEmail, Password: common.TestPassword}).Return(nil)
+					},
+					args:    args{createUser: &schemamodel.RequestCreateUser{Email: common.TestEmail, UserName: common.TestUserName, Password: common.TestPassword}},
+					wantErr: false,
 				},
-				args: args{user: &db.User{Name: common.TestUserName, Email: common.TestEmail, Password: common.TestPassword}},
-				wantErr: false,
-			},
-
 		*/
 	}
 	for _, tt := range tests {
@@ -49,8 +46,7 @@ func TestCreateUser_Execute(t *testing.T) {
 				tt.mockUserRepoFunc(userRepo)
 
 				// run target method
-				reqCreateUser := &schemamodel.RequestCreateUser{UserName: common.TestUserName, Email: common.TestEmail, Password: common.TestPassword}
-				_, err := NewCreateUser(userRepo).Execute(reqCreateUser)
+				_, err := NewCreateUser(userRepo).Execute(tt.args.createUser)
 
 				// assert
 				assert := assert.New(t)
@@ -59,7 +55,6 @@ func TestCreateUser_Execute(t *testing.T) {
 					assert.EqualError(err, tt.wantErrMsg)
 				} else {
 					assert.NoError(err)
-					// assert.Equal(db.User{ID:common.TestUserID, Name: common.TestUserName, Email: common.TestEmail, Password: common.TestHashedPassword, CreatedAt:common.GetTestTime(), UpdatedAt:common.GetTestTime()}, got)
 				}
 			})
 		})

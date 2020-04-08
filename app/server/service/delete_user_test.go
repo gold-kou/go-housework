@@ -6,7 +6,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/golang/mock/gomock"
 	"github.com/gold-kou/go-housework/app/common"
-	"github.com/gold-kou/go-housework/app/server/middleware"
+	"github.com/gold-kou/go-housework/app/model"
 	"github.com/gold-kou/go-housework/app/server/repository"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
@@ -14,7 +14,7 @@ import (
 
 func TestDeleteUser_Execute(t *testing.T) {
 	type args struct {
-		auth *middleware.Auth
+		auth *model.Auth
 	}
 	tests := []struct {
 		name             string
@@ -26,11 +26,9 @@ func TestDeleteUser_Execute(t *testing.T) {
 		{
 			name: "success",
 			mockUserRepoFunc: func(r *repository.MockUserRepositoryInterface) {
-				r.EXPECT().
-					DeleteUserWhereUsername(common.TestUserName).
-					Return(nil)
+				r.EXPECT().DeleteUserWhereUsername(common.TestUserName).Return(nil)
 			},
-			args:    args{&middleware.Auth{UserName: common.TestUserName}},
+			args:    args{&model.Auth{UserName: common.TestUserName}},
 			wantErr: false,
 		},
 	}

@@ -20,7 +20,7 @@ func DeleteFamily(w http.ResponseWriter, r *http.Request) {
 		userRepo := repository.NewUserRepository(tx)
 		familyRepo := repository.NewFamilyRepository(tx)
 		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
-		h := DeleteFamilyHandler{srv: service.NewDeleteFamily(userRepo, familyRepo, memberFamilyRepo)}
+		h := DeleteFamilyHandler{tok: middleware.NewTokenStruct(), srv: service.NewDeleteFamily(userRepo, familyRepo, memberFamilyRepo)}
 		resp, status, err := h.DeleteFamily(w, r)
 		if err != nil {
 			log.Error(err)
@@ -38,13 +38,14 @@ func DeleteFamily(w http.ResponseWriter, r *http.Request) {
 
 // DeleteFamilyHandler struct
 type DeleteFamilyHandler struct {
+	tok middleware.TokenInterface
 	srv service.DeleteFamilyServiceInterface
 }
 
 // DeleteFamily handler
 func (h DeleteFamilyHandler) DeleteFamily(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// verify header token
-	authUser, err := middleware.VerifyHeaderToken(r)
+	authUser, err := h.tok.VerifyHeaderToken(r)
 	if err != nil {
 		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	}
@@ -63,5 +64,5 @@ func (h DeleteFamilyHandler) DeleteFamily(w http.ResponseWriter, r *http.Request
 		return common.NewInternalServerError(err.Error()), http.StatusInternalServerError, err
 	}
 
-	return &schemamodel.ResponseDeleteFamily{Message: "Delete family completed"}, http.StatusOK, nil
+	return &schemamodel.ResponseDeleteFamily{Message: "delete complete"}, http.StatusOK, nil
 }

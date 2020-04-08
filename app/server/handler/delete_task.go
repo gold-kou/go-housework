@@ -21,7 +21,7 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 	common.Transact(func(tx *gorm.DB) error {
 		userRepo := repository.NewUserRepository(tx)
 		taskRepo := repository.NewTaskRepository(tx)
-		h := DeleteTaskHandler{srv: service.NewDeleteTask(userRepo, taskRepo)}
+		h := DeleteTaskHandler{tok: middleware.NewTokenStruct(), srv: service.NewDeleteTask(userRepo, taskRepo)}
 		resp, status, err := h.DeleteTask(w, r)
 		if err != nil {
 			log.Error(err)
@@ -39,13 +39,14 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 
 // DeleteTaskHandler struct
 type DeleteTaskHandler struct {
+	tok middleware.TokenInterface
 	srv service.DeleteTaskServiceInterface
 }
 
 // DeleteTask handler
 func (h DeleteTaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// verify header token
-	authUser, err := middleware.VerifyHeaderToken(r)
+	authUser, err := h.tok.VerifyHeaderToken(r)
 	if err != nil {
 		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	}
@@ -75,6 +76,6 @@ func (h DeleteTaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) (r
 		return common.NewInternalServerError(err.Error()), http.StatusInternalServerError, err
 	}
 
-	return &schemamodel.ResponseDeleteTask{Message: "the task is deleted"}, http.StatusOK, nil
+	return &schemamodel.ResponseDeleteTask{Message: "delete complete"}, http.StatusOK, nil
 
 }

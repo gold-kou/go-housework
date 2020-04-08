@@ -39,7 +39,7 @@ func (l *Login) Execute(userName string, password string) (string, error) {
 	}
 
 	// JWT生成
-	tokenString, err := middleware.GenerateToken(userName)
+	tokenString, err := middleware.NewTokenStruct().GenerateToken(userName)
 	if err != nil {
 		return "", common.NewInternalServerError(err.Error())
 	}

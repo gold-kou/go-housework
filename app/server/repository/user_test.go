@@ -154,6 +154,62 @@ func TestUserRepository_GetUserWhereUserID(t *testing.T) {
 	}
 }
 
+func TestUserRepository_GetUsersWhereUserIDs(t *testing.T) {
+	type args struct {
+		userIDs []uint64
+	}
+	tests := []struct {
+		name       string
+		dbMockFunc func(mock sqlmock.Sqlmock)
+		args       args
+		want       []*db.User
+		wantErr    bool
+		wantErrMsg string
+	}{
+		{
+			name: "success",
+			dbMockFunc: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE (id = ?)`)).
+					WithArgs(common.TestUserID).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "name", "email", "password", "created_at", "updated_at"}).
+						AddRow(common.TestUserID, common.TestUserName, common.TestEmail, common.TestPassword, common.GetGormTestTime(), common.GetGormTestTime()))
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE (id = ?)`)).
+					WithArgs(common.TestUserID2).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "name", "email", "password", "created_at", "updated_at"}).
+						AddRow(common.TestUserID2, common.TestUserName2, common.TestEmail2, common.TestPassword, common.GetGormTestTime(), common.GetGormTestTime()))
+			},
+			args: args{userIDs: []uint64{common.TestUserID, common.TestUserID2}},
+			want: []*db.User{
+				&db.User{ID: common.TestUserID, Name: common.TestUserName, Password: common.TestPassword, Email: common.TestEmail, CreatedAt: common.GetTestTime(), UpdatedAt: common.GetTestTime()},
+				&db.User{ID: common.TestUserID2, Name: common.TestUserName2, Password: common.TestPassword, Email: common.TestEmail2, CreatedAt: common.GetTestTime(), UpdatedAt: common.GetTestTime()}},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert := assert.New(t)
+			common.MockDB(t, func(db *gorm.DB, mock sqlmock.Sqlmock) {
+				tt.dbMockFunc(mock)
+				r := &UserRepository{
+					db: db,
+				}
+
+				// test target function
+				got, err := r.GetUsersWhereUserIDs(tt.args.userIDs)
+
+				// assert
+				if tt.wantErr {
+					assert.Error(err)
+					assert.Equal(tt.wantErrMsg, err.Error())
+				} else {
+					assert.NoError(err)
+					assert.Equal(tt.want, got)
+				}
+			})
+		})
+	}
+}
+
 func TestUserRepository_GetUserWhereUsername(t *testing.T) {
 	type args struct {
 		userName string

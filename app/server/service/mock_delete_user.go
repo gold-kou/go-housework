@@ -6,7 +6,7 @@ package service
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	middleware "github.com/gold-kou/go-housework/app/server/middleware"
+	model "github.com/gold-kou/go-housework/app/model"
 	reflect "reflect"
 )
 
@@ -34,7 +34,7 @@ func (m *MockDeleteUserServiceInterface) EXPECT() *MockDeleteUserServiceInterfac
 }
 
 // Execute mocks base method
-func (m *MockDeleteUserServiceInterface) Execute(arg0 *middleware.Auth) error {
+func (m *MockDeleteUserServiceInterface) Execute(arg0 *model.Auth) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Execute", arg0)
 	ret0, _ := ret[0].(error)

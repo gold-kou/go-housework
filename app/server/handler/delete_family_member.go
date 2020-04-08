@@ -18,10 +18,8 @@ import (
 // DeleteFamilyMember handler top
 func DeleteFamilyMember(w http.ResponseWriter, r *http.Request) {
 	common.Transact(func(tx *gorm.DB) error {
-		userRepo := repository.NewUserRepository(tx)
-		familyRepo := repository.NewFamilyRepository(tx)
 		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
-		h := DeleteFamilyMemberHandler{srv: service.NewDeleteFamilyMember(userRepo, familyRepo, memberFamilyRepo)}
+		h := DeleteFamilyMemberHandler{tok: middleware.NewTokenStruct(), srv: service.NewDeleteFamilyMember(memberFamilyRepo)}
 		resp, status, err := h.DeleteFamilyMember(w, r)
 		if err != nil {
 			log.Error(err)
@@ -39,13 +37,14 @@ func DeleteFamilyMember(w http.ResponseWriter, r *http.Request) {
 
 // DeleteFamilyMemberHandler struct
 type DeleteFamilyMemberHandler struct {
+	tok middleware.TokenInterface
 	srv service.DeleteFamilyMemberServiceInterface
 }
 
 // DeleteFamilyMember handler
 func (h DeleteFamilyMemberHandler) DeleteFamilyMember(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// verify header token
-	authUser, err := middleware.VerifyHeaderToken(r)
+	authUser, err := h.tok.VerifyHeaderToken(r)
 	if err != nil {
 		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	}
@@ -75,5 +74,5 @@ func (h DeleteFamilyMemberHandler) DeleteFamilyMember(w http.ResponseWriter, r *
 		return common.NewInternalServerError(err.Error()), http.StatusBadRequest, err
 	}
 
-	return &schemamodel.ResponseDeleteFamilyMember{Message: "deleted the member from the family"}, http.StatusOK, nil
+	return &schemamodel.ResponseDeleteFamilyMember{Message: "delete complete"}, http.StatusOK, nil
 }
