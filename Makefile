@@ -28,7 +28,7 @@ cross-install:
 	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go install -a -installsuffix cgo -ldflags '-w -extldflags "-static"' github.com/gold-kou/go-housework/app/cmd/...
 
 .PHONY: test
-# serviceとhandlerを同時に走らせると、PostgresqlへのTRUNCATEがバッティングしてしまうため、テストの同時実行数(-p)を1にしています
+# serviceとhandlerを同時に走らせると、PostgresqlへのTRUNCATEがバッティングしてしまうため、テストの同時実行数(-p)を1に設定
 test:
 	@go test -p=1 -covermode=count -coverprofile=cover.out github.com/gold-kou/go-housework/app/...
 	@go tool cover -html=cover.out -o coverage.html

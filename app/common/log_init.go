@@ -8,15 +8,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// LogInit ログの初期化処理
+// LogInit log init set up
 func LogInit() {
-	// 出力先は標準出力とする
+	// stdout
 	log.SetOutput(os.Stdout)
 
-	// JSONで出力する
+	// JSON format
 	log.SetFormatter(&log.JSONFormatter{})
 
-	// 開発時は全てのログ（TRACE以上）、それ以外（テスト、ステージング、本番環境）はINFO以上のログレベルを出力する
+	// local: over TRACE, stg/prd: over INFO
 	log.SetLevel(log.InfoLevel)
 	if os.Getenv("RUNSERVER") == "LOCAL" {
 		log.SetLevel(log.TraceLevel)

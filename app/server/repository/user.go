@@ -10,9 +10,9 @@ import (
 type UserRepositoryInterface interface {
 	InsertUser(*db.User) error
 	GetUserWhereUsername(string) (*db.User, error)
-	DeleteUserWhereUsername(string) error
 	GetUserWhereUserID(uint64) (*db.User, error)
 	GetUsersWhereUserIDs([]uint64) ([]*db.User, error)
+	DeleteUserWhereUsername(string) error
 }
 
 // UserRepository is a repository of user

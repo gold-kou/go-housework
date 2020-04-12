@@ -1,14 +1,14 @@
 package service
 
 import (
+	"github.com/gold-kou/go-housework/app/model"
 	"github.com/gold-kou/go-housework/app/model/db"
-	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
 )
 
 // DeleteTaskServiceInterface is a service interface of deleteTask
 type DeleteTaskServiceInterface interface {
-	Execute(*middleware.Auth, uint64) error
+	Execute(*model.Auth, uint64) error
 }
 
 // DeleteTask struct
@@ -26,7 +26,7 @@ func NewDeleteTask(userRepo repository.UserRepositoryInterface, taskRepo reposit
 }
 
 // Execute service main process
-func (t *DeleteTask) Execute(auth *middleware.Auth, taskID uint64) error {
+func (t *DeleteTask) Execute(auth *model.Auth, taskID uint64) error {
 	// get user id from token
 	user, err := t.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {

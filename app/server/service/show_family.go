@@ -1,14 +1,14 @@
 package service
 
 import (
+	"github.com/gold-kou/go-housework/app/model"
 	"github.com/gold-kou/go-housework/app/model/db"
-	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
 )
 
 // ShowFamilyServiceInterface is a service interface of showFamily
 type ShowFamilyServiceInterface interface {
-	Execute(*middleware.Auth) (*db.Family, error)
+	Execute(*model.Auth) (*db.Family, error)
 }
 
 // ShowFamily struct
@@ -28,7 +28,7 @@ func NewShowFamily(userRepo repository.UserRepositoryInterface, familyRepo repos
 }
 
 // Execute service main process
-func (f *ShowFamily) Execute(auth *middleware.Auth) (*db.Family, error) {
+func (f *ShowFamily) Execute(auth *model.Auth) (*db.Family, error) {
 	// get user id
 	user, err := f.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {

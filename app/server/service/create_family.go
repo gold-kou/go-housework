@@ -2,15 +2,15 @@ package service
 
 import (
 	"github.com/gold-kou/go-housework/app/common"
+	"github.com/gold-kou/go-housework/app/model"
 	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
-	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
 )
 
 // CreateFamilyServiceInterface is a service interface of createFamily
 type CreateFamilyServiceInterface interface {
-	Execute(*middleware.Auth, *schemamodel.RequestCreateFamily) (*db.Family, error)
+	Execute(*model.Auth, *schemamodel.RequestCreateFamily) (*db.Family, error)
 }
 
 // CreateFamily struct
@@ -30,7 +30,7 @@ func NewCreateFamily(userRepo repository.UserRepositoryInterface, familyRepo rep
 }
 
 // Execute service main process
-func (f *CreateFamily) Execute(auth *middleware.Auth, createFamily *schemamodel.RequestCreateFamily) (*db.Family, error) {
+func (f *CreateFamily) Execute(auth *model.Auth, createFamily *schemamodel.RequestCreateFamily) (*db.Family, error) {
 	// get user id
 	user, err := f.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {

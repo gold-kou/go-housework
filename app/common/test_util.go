@@ -11,23 +11,43 @@ import (
 
 const (
 	// TestUserID TestUserID
-	TestUserID = 1
+	TestUserID = uint64(1)
 	// TestUserID2 TestUserID2
-	TestUserID2 = 2
+	TestUserID2 = uint64(2)
 	// TestUserName TestUserName
 	TestUserName = "test-user"
+	// TestUserName2 TestUserName
+	TestUserName2 = "test-user2"
 	// TestPassword TestPassword
 	TestPassword = "123456"
 	// TestWrongPassword TestWrongPassword
 	TestWrongPassword = "wrongpassword"
 	// TestHashedPassword TestHashedPassword
 	TestHashedPassword = "$2a$10$sSZRLWLaKu2JxPz9zpNjxek3N9UWMA82pyiEWoI1yXA.IE7KcMxTq"
+	// TestToken TestToken
+	TestToken = "test-token"
 	// TestEmail TestEmail
 	TestEmail = "test@example.com"
+	// TestEmail2 TestEmail
+	TestEmail2 = "test2@example.com"
 	// TestFamilyID TestFamilyID
-	TestFamilyID = 1
+	TestFamilyID = uint64(1)
 	// TestFamilyName TestFamilyName
 	TestFamilyName = "test-family"
+	// TestRoleHead TestRoleHead
+	TestRoleHead = "head"
+	// TestRoleMember TestRoleMember
+	TestRoleMember = "member"
+	// TestTaskID1 TestTaskID1
+	TestTaskID1 = uint64(1)
+	// TestTaskName1 TestTaskName1
+	TestTaskName1 = "test-task1"
+	// TestTaskStatusTodo TestTaskStatusTodo
+	TestTaskStatusTodo = "todo"
+	// TestTaskStatusDone TestTaskStatusDone
+	TestTaskStatusDone = "done"
+	// TestTaskDate TestTaskDate
+	TestTaskDate = "2020-12-31"
 	// TestSecretKey TestSecretKey
 	TestSecretKey = "test_secret_key"
 )

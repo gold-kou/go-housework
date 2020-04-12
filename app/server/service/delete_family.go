@@ -1,13 +1,13 @@
 package service
 
 import (
-	"github.com/gold-kou/go-housework/app/server/middleware"
+	"github.com/gold-kou/go-housework/app/model"
 	"github.com/gold-kou/go-housework/app/server/repository"
 )
 
 // DeleteFamilyServiceInterface is a service interface of deleteFamily
 type DeleteFamilyServiceInterface interface {
-	Execute(*middleware.Auth) error
+	Execute(*model.Auth) error
 }
 
 // DeleteFamily struct
@@ -27,7 +27,7 @@ func NewDeleteFamily(userRepo repository.UserRepositoryInterface, familyRepo rep
 }
 
 // Execute service main process
-func (f *DeleteFamily) Execute(auth *middleware.Auth) error {
+func (f *DeleteFamily) Execute(auth *model.Auth) error {
 	// get user id
 	user, err := f.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {

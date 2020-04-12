@@ -1,14 +1,14 @@
 package service
 
 import (
+	"github.com/gold-kou/go-housework/app/model"
 	"github.com/gold-kou/go-housework/app/model/db"
-	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
 )
 
 // ListTasksServiceInterface is a service interface of listTasks
 type ListTasksServiceInterface interface {
-	Execute(*middleware.Auth, string) ([]*db.Task, *db.Family, []*db.User, error)
+	Execute(*model.Auth, string) ([]*db.Task, *db.Family, []*db.User, error)
 }
 
 // ListTasks struct
@@ -30,7 +30,7 @@ func NewListTasks(userRepo repository.UserRepositoryInterface, familyRepo reposi
 }
 
 // Execute service main process
-func (t *ListTasks) Execute(auth *middleware.Auth, targetDate string) ([]*db.Task, *db.Family, []*db.User, error) {
+func (t *ListTasks) Execute(auth *model.Auth, targetDate string) ([]*db.Task, *db.Family, []*db.User, error) {
 	// get user id from token
 	user, err := t.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {

@@ -62,20 +62,6 @@ func (mr *MockUserRepositoryInterfaceMockRecorder) GetUserWhereUsername(arg0 int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserWhereUsername", reflect.TypeOf((*MockUserRepositoryInterface)(nil).GetUserWhereUsername), arg0)
 }
 
-// DeleteUserWhereUsername mocks base method
-func (m *MockUserRepositoryInterface) DeleteUserWhereUsername(arg0 string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteUserWhereUsername", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// DeleteUserWhereUsername indicates an expected call of DeleteUserWhereUsername
-func (mr *MockUserRepositoryInterfaceMockRecorder) DeleteUserWhereUsername(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserWhereUsername", reflect.TypeOf((*MockUserRepositoryInterface)(nil).DeleteUserWhereUsername), arg0)
-}
-
 // GetUserWhereUserID mocks base method
 func (m *MockUserRepositoryInterface) GetUserWhereUserID(arg0 uint64) (*db.User, error) {
 	m.ctrl.T.Helper()
@@ -104,4 +90,18 @@ func (m *MockUserRepositoryInterface) GetUsersWhereUserIDs(arg0 []uint64) ([]*db
 func (mr *MockUserRepositoryInterfaceMockRecorder) GetUsersWhereUserIDs(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsersWhereUserIDs", reflect.TypeOf((*MockUserRepositoryInterface)(nil).GetUsersWhereUserIDs), arg0)
+}
+
+// DeleteUserWhereUsername mocks base method
+func (m *MockUserRepositoryInterface) DeleteUserWhereUsername(arg0 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUserWhereUsername", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteUserWhereUsername indicates an expected call of DeleteUserWhereUsername
+func (mr *MockUserRepositoryInterfaceMockRecorder) DeleteUserWhereUsername(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserWhereUsername", reflect.TypeOf((*MockUserRepositoryInterface)(nil).DeleteUserWhereUsername), arg0)
 }

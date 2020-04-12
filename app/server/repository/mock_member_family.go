@@ -5,10 +5,9 @@
 package repository
 
 import (
-	reflect "reflect"
-
 	gomock "github.com/golang/mock/gomock"
 	db "github.com/gold-kou/go-housework/app/model/db"
+	reflect "reflect"
 )
 
 // MockMemberFamilyRepositoryInterface is a mock of MemberFamilyRepositoryInterface interface
@@ -77,10 +76,10 @@ func (mr *MockMemberFamilyRepositoryInterfaceMockRecorder) DeleteMemberFromFamil
 }
 
 // GetMemberFamilyWhereMemberID mocks base method
-func (m *MockMemberFamilyRepositoryInterface) GetMemberFamilyWhereMemberID(arg0 uint64) (db.MemberFamily, error) {
+func (m *MockMemberFamilyRepositoryInterface) GetMemberFamilyWhereMemberID(arg0 uint64) (*db.MemberFamily, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetMemberFamilyWhereMemberID", arg0)
-	ret0, _ := ret[0].(db.MemberFamily)
+	ret0, _ := ret[0].(*db.MemberFamily)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -91,17 +90,17 @@ func (mr *MockMemberFamilyRepositoryInterfaceMockRecorder) GetMemberFamilyWhereM
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMemberFamilyWhereMemberID", reflect.TypeOf((*MockMemberFamilyRepositoryInterface)(nil).GetMemberFamilyWhereMemberID), arg0)
 }
 
-// GetMemberFamiliesWhereFamilyID mocks base method
-func (m *MockMemberFamilyRepositoryInterface) GetMemberFamiliesWhereFamilyID(arg0 uint64) ([]db.MemberFamily, error) {
+// ListMemberFamiliesWhereFamilyID mocks base method
+func (m *MockMemberFamilyRepositoryInterface) ListMemberFamiliesWhereFamilyID(arg0 uint64) ([]*db.MemberFamily, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMemberFamiliesWhereFamilyID", arg0)
-	ret0, _ := ret[0].([]db.MemberFamily)
+	ret := m.ctrl.Call(m, "ListMemberFamiliesWhereFamilyID", arg0)
+	ret0, _ := ret[0].([]*db.MemberFamily)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetMemberFamiliesWhereFamilyID indicates an expected call of GetMemberFamiliesWhereFamilyID
-func (mr *MockMemberFamilyRepositoryInterfaceMockRecorder) GetMemberFamiliesWhereFamilyID(arg0 interface{}) *gomock.Call {
+// ListMemberFamiliesWhereFamilyID indicates an expected call of ListMemberFamiliesWhereFamilyID
+func (mr *MockMemberFamilyRepositoryInterfaceMockRecorder) ListMemberFamiliesWhereFamilyID(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMemberFamiliesWhereFamilyID", reflect.TypeOf((*MockMemberFamilyRepositoryInterface)(nil).GetMemberFamiliesWhereFamilyID), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMemberFamiliesWhereFamilyID", reflect.TypeOf((*MockMemberFamilyRepositoryInterface)(nil).ListMemberFamiliesWhereFamilyID), arg0)
 }

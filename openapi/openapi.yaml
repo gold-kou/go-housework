@@ -740,13 +740,8 @@ components:
       properties:
         user:
           $ref: '#/components/schemas/User'
-        message:
-          description: HTTPレスポンスメッセージ
-          type: string
-          example: 'The user registration is completed.'
       required:
         - user
-        - message
     ResponseDeleteUser:
       description: ユーザ削除APIの正常系レスポンススキーマ
       type: object

@@ -1,13 +1,13 @@
 package service
 
 import (
-	"github.com/gold-kou/go-housework/app/server/middleware"
+	"github.com/gold-kou/go-housework/app/model"
 	"github.com/gold-kou/go-housework/app/server/repository"
 )
 
 // DeleteUserServiceInterface is a service interface of deleteUser
 type DeleteUserServiceInterface interface {
-	Execute(*middleware.Auth) error
+	Execute(*model.Auth) error
 }
 
 // DeleteUser struct
@@ -23,7 +23,7 @@ func NewDeleteUser(userRepo repository.UserRepositoryInterface) *DeleteUser {
 }
 
 // Execute delete user
-func (u *DeleteUser) Execute(auth *middleware.Auth) error {
+func (u *DeleteUser) Execute(auth *model.Auth) error {
 	// data
 	userName := auth.UserName
 

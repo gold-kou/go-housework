@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gold-kou/go-housework/app/common"
-	"github.com/gold-kou/go-housework/app/model/db"
+	"github.com/gold-kou/go-housework/app/model"
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
 	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
@@ -22,7 +22,7 @@ func CreateFamily(w http.ResponseWriter, r *http.Request) {
 		userRepo := repository.NewUserRepository(tx)
 		familyRepo := repository.NewFamilyRepository(tx)
 		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
-		h := CreateFamilyHandler{srv: service.NewCreateFamily(userRepo, familyRepo, memberFamilyRepo)}
+		h := CreateFamilyHandler{tok: middleware.NewTokenStruct(), srv: service.NewCreateFamily(userRepo, familyRepo, memberFamilyRepo)}
 		resp, status, err := h.CreateFamily(w, r)
 		if err != nil {
 			log.Error(err)
@@ -40,13 +40,15 @@ func CreateFamily(w http.ResponseWriter, r *http.Request) {
 
 // CreateFamilyHandler struct
 type CreateFamilyHandler struct {
-	srv service.CreateFamilyServiceInterface
+	tok      middleware.TokenInterface
+	authUser *model.Auth
+	srv      service.CreateFamilyServiceInterface
 }
 
 // CreateFamily handler
 func (h *CreateFamilyHandler) CreateFamily(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// verify header token
-	authUser, err := middleware.VerifyHeaderToken(r)
+	authUser, err := h.tok.VerifyHeaderToken(r)
 	if err != nil {
 		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	}
@@ -68,8 +70,7 @@ func (h *CreateFamilyHandler) CreateFamily(w http.ResponseWriter, r *http.Reques
 	}
 
 	// service layer
-	var f *db.Family
-	f, err = h.srv.Execute(authUser, &createFamily)
+	f, err := h.srv.Execute(authUser, &createFamily)
 	switch err := err.(type) {
 	case nil:
 	case *common.BadRequestError:

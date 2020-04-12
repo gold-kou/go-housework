@@ -33,16 +33,16 @@ func (m *MockLoginServiceInterface) EXPECT() *MockLoginServiceInterfaceMockRecor
 }
 
 // Execute mocks base method
-func (m *MockLoginServiceInterface) Execute() (string, error) {
+func (m *MockLoginServiceInterface) Execute(arg0, arg1 string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Execute")
+	ret := m.ctrl.Call(m, "Execute", arg0, arg1)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Execute indicates an expected call of Execute
-func (mr *MockLoginServiceInterfaceMockRecorder) Execute() *gomock.Call {
+func (mr *MockLoginServiceInterfaceMockRecorder) Execute(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockLoginServiceInterface)(nil).Execute))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockLoginServiceInterface)(nil).Execute), arg0, arg1)
 }

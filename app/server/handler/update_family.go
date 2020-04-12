@@ -20,7 +20,7 @@ func UpdateFamily(w http.ResponseWriter, r *http.Request) {
 		userRepo := repository.NewUserRepository(tx)
 		familyRepo := repository.NewFamilyRepository(tx)
 		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
-		h := UpdateFamilyHandler{srv: service.NewUpdateFamily(userRepo, familyRepo, memberFamilyRepo)}
+		h := UpdateFamilyHandler{tok: middleware.NewTokenStruct(), srv: service.NewUpdateFamily(userRepo, familyRepo, memberFamilyRepo)}
 		resp, status, err := h.UpdateFamily(w, r)
 		if err != nil {
 			log.Error(err)
@@ -38,13 +38,14 @@ func UpdateFamily(w http.ResponseWriter, r *http.Request) {
 
 // UpdateFamilyHandler struct
 type UpdateFamilyHandler struct {
+	tok middleware.TokenInterface
 	srv service.UpdateFamilyServiceInterface
 }
 
 // UpdateFamily handler
 func (h UpdateFamilyHandler) UpdateFamily(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// verify header token
-	authUser, err := middleware.VerifyHeaderToken(r)
+	authUser, err := h.tok.VerifyHeaderToken(r)
 	if err != nil {
 		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	}

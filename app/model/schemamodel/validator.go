@@ -72,11 +72,19 @@ func (rct *RequestCreateTask) ValidateParam() error {
 // ValidateParam validation
 func (rut *RequestUpdateTask) ValidateParam() error {
 	var fieldRules []*validation.FieldRules
-	fieldRules = append(fieldRules, validation.Field(&rut.Task, validation.Required))
-	// fieldRules = append(fieldRules, validation.Field(&rut.Task.TaskId, validation.Required))
-	// fieldRules = append(fieldRules, validation.Field(&rut.Task.TaskName, validation.Required))
-	// fieldRules = append(fieldRules, validation.Field(&rut.Task.MemberName, validation.Required))
-	// fieldRules = append(fieldRules, validation.Field(&rut.Task.Status, validation.Required, validation.In("todo", "done")))
-	// fieldRules = append(fieldRules, validation.Field(&rut.Task.Date, validation.Required, validation.Date("2006-01-02")))
+	fieldRules = append(fieldRules, validation.Field(&rut.Task))
 	return validation.ValidateStruct(rut, fieldRules...)
 }
+
+/*
+func (t *Task) Validate() error {
+	var fieldRules []*validation.FieldRules
+	if t != nil {
+		fieldRules = append(fieldRules, validation.Field(&t.TaskId, validation.Required))
+		fieldRules = append(fieldRules, validation.Field(&t.TaskName, validation.Required))
+		fieldRules = append(fieldRules, validation.Field(&t.MemberName, validation.Required))
+		fieldRules = append(fieldRules, validation.Field(&t.Status, validation.Required, validation.In("todo", "done")))
+		fieldRules = append(fieldRules, validation.Field(&t.Date, validation.Required, validation.Date("2006-01-02")))
+	}
+	return validation.ValidateStruct(t, fieldRules...)
+}*/

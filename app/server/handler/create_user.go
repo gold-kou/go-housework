@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/gold-kou/go-housework/app/server/middleware"
 	"io/ioutil"
 	"net/http"
 
@@ -17,7 +18,7 @@ import (
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	common.Transact(func(tx *gorm.DB) error {
 		userRepo := repository.NewUserRepository(tx)
-		h := CreateUserHandler{srv: service.NewCreateUser(userRepo)}
+		h := CreateUserHandler{tok: middleware.NewTokenStruct(), srv: service.NewCreateUser(userRepo)}
 		resp, status, err := h.CreateUser(w, r)
 		if err != nil {
 			log.Error(err)
@@ -35,6 +36,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 // CreateUserHandler struct
 type CreateUserHandler struct {
+	tok middleware.TokenInterface
 	srv service.CreateUserServiceInterface
 }
 
@@ -68,5 +70,5 @@ func (h *CreateUserHandler) CreateUser(w http.ResponseWriter, r *http.Request) (
 		return common.NewInternalServerError(err.Error()), http.StatusInternalServerError, err
 	}
 
-	return &schemamodel.ResponseCreateUser{User: schemamodel.User{UserId: int64(u.ID), UserName: u.Name}, Message: "new user created"}, http.StatusOK, nil
+	return &schemamodel.ResponseCreateUser{User: schemamodel.User{UserId: int64(u.ID), UserName: u.Name}}, http.StatusOK, nil
 }

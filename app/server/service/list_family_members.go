@@ -1,14 +1,14 @@
 package service
 
 import (
+	"github.com/gold-kou/go-housework/app/model"
 	"github.com/gold-kou/go-housework/app/model/db"
-	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
 )
 
 // ListFamilyMembersServiceInterface is a service interface of listFamilyMembers
 type ListFamilyMembersServiceInterface interface {
-	Execute(*middleware.Auth) (*db.Family, []*db.User, error)
+	Execute(*model.Auth) (*db.Family, []*db.User, error)
 }
 
 // ListFamilyMembers struct
@@ -28,7 +28,7 @@ func NewListFamilyMembers(userRepo repository.UserRepositoryInterface, familyRep
 }
 
 // Execute service main process
-func (f *ListFamilyMembers) Execute(auth *middleware.Auth) (*db.Family, []*db.User, error) {
+func (f *ListFamilyMembers) Execute(auth *model.Auth) (*db.Family, []*db.User, error) {
 	// get user id from token
 	user, err := f.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {

@@ -1,15 +1,15 @@
 package service
 
 import (
+	"github.com/gold-kou/go-housework/app/model"
 	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
-	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
 )
 
 // UpdateTaskServiceInterface is a service interface of updateTask
 type UpdateTaskServiceInterface interface {
-	Execute(*middleware.Auth, *schemamodel.RequestUpdateTask) (*db.Task, *db.Family, *db.User, error)
+	Execute(*model.Auth, *schemamodel.RequestUpdateTask) (*db.Task, *db.Family, *db.User, error)
 }
 
 // UpdateTask struct
@@ -32,7 +32,7 @@ func NewUpdateTask(userRepo repository.UserRepositoryInterface, familyRepo repos
 }
 
 // Execute service main process
-func (t *UpdateTask) Execute(auth *middleware.Auth, reqUpdateTask *schemamodel.RequestUpdateTask) (*db.Task, *db.Family, *db.User, error) {
+func (t *UpdateTask) Execute(auth *model.Auth, reqUpdateTask *schemamodel.RequestUpdateTask) (*db.Task, *db.Family, *db.User, error) {
 	// get user id from token
 	user, err := t.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {

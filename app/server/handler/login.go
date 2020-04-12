@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/gold-kou/go-housework/app/server/middleware"
 	"net/http"
 
 	"github.com/gold-kou/go-housework/app/common"
@@ -18,7 +19,7 @@ import (
 func Login(w http.ResponseWriter, r *http.Request) {
 	common.Transact(func(tx *gorm.DB) error {
 		userRepo := repository.NewUserRepository(tx)
-		h := LoginHandler{srv: service.NewLogin(userRepo)}
+		h := LoginHandler{tok: middleware.NewTokenStruct(), srv: service.NewLogin(userRepo)}
 		resp, status, err := h.Login(w, r)
 		if err != nil {
 			log.Error(err)
@@ -36,6 +37,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 // LoginHandler struct
 type LoginHandler struct {
+	tok middleware.TokenInterface
 	srv service.LoginServiceInterface
 }
 

@@ -7,17 +7,27 @@ import (
 	"time"
 
 	"github.com/gold-kou/go-housework/app/common"
+	"github.com/gold-kou/go-housework/app/model"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 )
 
-// Auth struct
-type Auth struct {
-	UserName string
+// TokenInterface interface
+type TokenInterface interface {
+	GenerateToken(string) (string, error)
+	VerifyHeaderToken(*http.Request) (*model.Auth, error)
+}
+
+// TokenStruct struct
+type TokenStruct struct{}
+
+// NewTokenStruct constructor
+func NewTokenStruct() *TokenStruct {
+	return &TokenStruct{}
 }
 
 // GenerateToken generate and returns JWT
-func GenerateToken(userName string) (tokenString string, err error) {
+func (t *TokenStruct) GenerateToken(userName string) (tokenString string, err error) {
 	// headerのセット
 	token := jwt.New(jwt.SigningMethodHS256)
 
@@ -37,7 +47,7 @@ func GenerateToken(userName string) (tokenString string, err error) {
 }
 
 // VerifyHeaderToken verify token and get auth info
-func VerifyHeaderToken(r *http.Request) (*Auth, error) {
+func (t *TokenStruct) VerifyHeaderToken(r *http.Request) (*model.Auth, error) {
 	// get jwt from header
 	authHeader := r.Header.Get("Authorization")
 
@@ -53,7 +63,7 @@ func VerifyHeaderToken(r *http.Request) (*Auth, error) {
 }
 
 // verifyToken verify token and return user name
-func verifyToken(tokenString string) (*Auth, error) {
+func verifyToken(tokenString string) (*model.Auth, error) {
 	// verify
 	parsedToken, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// check signing method
@@ -83,7 +93,7 @@ func verifyToken(tokenString string) (*Auth, error) {
 		return nil, common.NewAuthorizationError("not found name in token")
 	}
 
-	return &Auth{
+	return &model.Auth{
 		UserName: userName,
 	}, nil
 }

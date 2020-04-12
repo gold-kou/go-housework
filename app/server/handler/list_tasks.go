@@ -22,7 +22,7 @@ func ListTasks(w http.ResponseWriter, r *http.Request) {
 		familyRepo := repository.NewFamilyRepository(tx)
 		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
 		taskRepo := repository.NewTaskRepository(tx)
-		h := ListTasksHandler{srv: service.NewListTasks(userRepo, familyRepo, memberFamilyRepo, taskRepo)}
+		h := ListTasksHandler{tok: middleware.NewTokenStruct(), srv: service.NewListTasks(userRepo, familyRepo, memberFamilyRepo, taskRepo)}
 		resp, status, err := h.ListTasks(w, r)
 		if err != nil {
 			log.Error(err)
@@ -40,13 +40,14 @@ func ListTasks(w http.ResponseWriter, r *http.Request) {
 
 // ListTasksHandler struct
 type ListTasksHandler struct {
+	tok middleware.TokenInterface
 	srv service.ListTasksServiceInterface
 }
 
 // ListTasks handler
 func (h ListTasksHandler) ListTasks(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// verify header token
-	authUser, err := middleware.VerifyHeaderToken(r)
+	authUser, err := h.tok.VerifyHeaderToken(r)
 	if err != nil {
 		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	}

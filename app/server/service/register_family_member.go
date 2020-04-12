@@ -2,15 +2,15 @@ package service
 
 import (
 	"github.com/gold-kou/go-housework/app/common"
+	"github.com/gold-kou/go-housework/app/model"
 	"github.com/gold-kou/go-housework/app/model/db"
 	"github.com/gold-kou/go-housework/app/model/schemamodel"
-	"github.com/gold-kou/go-housework/app/server/middleware"
 	"github.com/gold-kou/go-housework/app/server/repository"
 )
 
 // RegisterFamilyMemberServiceInterface is a service interface of registerFamilyMember
 type RegisterFamilyMemberServiceInterface interface {
-	Execute(*middleware.Auth, *schemamodel.RequestRegisterFamilyMember) (*db.User, *db.Family, error)
+	Execute(*model.Auth, *schemamodel.RequestRegisterFamilyMember) (*db.User, *db.Family, error)
 }
 
 // RegisterFamilyMember struct
@@ -30,7 +30,7 @@ func NewRegisterFamilyMember(userRepo repository.UserRepositoryInterface, family
 }
 
 // Execute service main process
-func (fm *RegisterFamilyMember) Execute(auth *middleware.Auth, registerFamilyMember *schemamodel.RequestRegisterFamilyMember) (*db.User, *db.Family, error) {
+func (fm *RegisterFamilyMember) Execute(auth *model.Auth, registerFamilyMember *schemamodel.RequestRegisterFamilyMember) (*db.User, *db.Family, error) {
 	// get user_id from auth
 	user, err := fm.userRepo.GetUserWhereUsername(auth.UserName)
 	if err != nil {

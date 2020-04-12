@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/gold-kou/go-housework/app/model"
 	"io/ioutil"
 	"net/http"
 
@@ -23,7 +24,7 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		familyRepo := repository.NewFamilyRepository(tx)
 		memberFamilyRepo := repository.NewMemberFamilyRepository(tx)
 		taskRepo := repository.NewTaskRepository(tx)
-		h := CreateTaskHandler{srv: service.NewCreateTask(userRepo, familyRepo, memberFamilyRepo, taskRepo)}
+		h := CreateTaskHandler{tok: middleware.NewTokenStruct(), srv: service.NewCreateTask(userRepo, familyRepo, memberFamilyRepo, taskRepo)}
 		resp, status, err := h.CreateTask(w, r)
 		if err != nil {
 			log.Error(err)
@@ -41,13 +42,15 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 
 // CreateTaskHandler struct
 type CreateTaskHandler struct {
-	srv service.CreateTaskServiceInterface
+	tok      middleware.TokenInterface
+	authUser *model.Auth
+	srv      service.CreateTaskServiceInterface
 }
 
 // CreateTask handler
 func (h CreateTaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) (resp interface{}, status int, err error) {
 	// verify header token
-	authUser, err := middleware.VerifyHeaderToken(r)
+	authUser, err := h.tok.VerifyHeaderToken(r)
 	if err != nil {
 		return common.NewAuthorizationError(err.Error()), http.StatusUnauthorized, err
 	}
